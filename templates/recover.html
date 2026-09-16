@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Recuperar acceso — Vaka{% endblock %}
+{% block bodyclass %}paper-page{% endblock %}
+{% block content %}
+<div class="wrap">
+  <div class="wordmark" style="color:var(--gold);">Vaka</div>
+  <h1 class="headline">¿Perdiste el link?</h1>
+  <p class="subline">Poné el mail con el que creaste el regalo y te mandamos de nuevo el link para administrarlo.</p>
+
+  {% if not enabled %}
+  <div class="flash">Esta función todavía no está activa. Mientras tanto, escribinos y te ayudamos a mano.</div>
+  {% else %}
+  <form method="POST">
+    <label for="email">Tu mail</label>
+    <input type="email" id="email" name="email" placeholder="Ej: martina@mail.com" required>
+    <button class="btn" type="submit">Enviarme el link</button>
+  </form>
+  {% endif %}
+</div>
+{% endblock %}

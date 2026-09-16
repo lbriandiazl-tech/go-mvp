@@ -4,6 +4,7 @@ from flask import Flask, render_template, request, redirect, url_for, abort, fla
 import db
 import catalog
 import mercadopago_client
+import resend_client
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "dev-only-change-in-production")
@@ -27,19 +28,60 @@ def create_gift():
         recipient_name = request.form["recipient_name"].strip()
         occasion = request.form["occasion"].strip()
         organizer_name = request.form["organizer_name"].strip()
+        organizer_email = request.form.get("organizer_email", "").strip().lower()
+        bank_details = request.form.get("bank_details", "").strip()
         try:
             min_contribution = int(request.form["min_contribution"])
         except (ValueError, KeyError):
             min_contribution = 0
 
-        if not (recipient_name and occasion and organizer_name and min_contribution > 0):
-            flash("Completá todos los campos para crear el regalo.")
+        if not (recipient_name and occasion and organizer_name and organizer_email
+                and min_contribution > 0 and bank_details):
+            flash("Completá todos los campos, incluidos tu mail y los datos bancarios.")
             return render_template("create_gift.html")
 
-        slug, token = db.create_gift(recipient_name, occasion, organizer_name, min_contribution)
+        slug, token = db.create_gift(
+            recipient_name, occasion, organizer_name, organizer_email,
+            min_contribution, bank_details,
+        )
+
+        if resend_client.is_configured():
+            organizer_url = url_for("organizer_panel", slug=slug, token=token, _external=True)
+            try:
+                resend_client.send_organizer_link_email(organizer_email, occasion, organizer_url)
+            except resend_client.ResendError:
+                pass  # no bloqueamos la creación del regalo si el mail falla
+
         return redirect(url_for("organizer_panel", slug=slug, token=token))
 
     return render_template("create_gift.html")
+
+
+@app.route("/recuperar", methods=["GET", "POST"])
+def recover_access():
+    if request.method == "POST":
+        email = request.form.get("email", "").strip().lower()
+        if email and resend_client.is_configured():
+            gifts = db.get_gifts_by_organizer_email(email)
+            if gifts:
+                gifts_for_email = [
+                    dict(
+                        occasion=g["occasion"],
+                        organizer_url=url_for(
+                            "organizer_panel", slug=g["slug"], token=g["organizer_token"], _external=True
+                        ),
+                    )
+                    for g in gifts
+                ]
+                try:
+                    resend_client.send_recovery_email(email, gifts_for_email)
+                except resend_client.ResendError:
+                    pass
+        # Mismo mensaje exista o no el mail — así nadie puede usar este
+        # formulario para averiguar si un mail organizó algo acá.
+        return render_template("recover_sent.html")
+
+    return render_template("recover.html", enabled=resend_client.is_configured())
 
 
 # ---------------------------------------------------------------
@@ -156,10 +198,18 @@ def organizer_panel(slug):
         f"Sumate acá: {share_url}"
     )
     whatsapp_message = quote(whatsapp_text)
+
+    recipient_url = url_for("recipient_experience", slug=slug, _external=True)
+    recipient_whatsapp_text = (
+        f"¡Feliz {gift['occasion']}! 🎁 Tenés un regalo esperándote, entrá acá para abrirlo: {recipient_url}"
+    )
+    recipient_whatsapp_message = quote(recipient_whatsapp_text)
+
     return render_template(
         "organizer_panel.html",
         gift=gift, contributions=contributions, total=total,
         token=token, share_url=share_url, whatsapp_message=whatsapp_message,
+        recipient_url=recipient_url, recipient_whatsapp_message=recipient_whatsapp_message,
     )
 
 

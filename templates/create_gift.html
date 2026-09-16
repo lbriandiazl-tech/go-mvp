@@ -21,8 +21,16 @@
     <label for="organizer_name">Tu nombre (organizador/a)</label>
     <input type="text" id="organizer_name" name="organizer_name" placeholder="Ej: Martina Pérez" required>
 
+    <label for="organizer_email">Tu mail</label>
+    <input type="email" id="organizer_email" name="organizer_email" placeholder="Ej: martina@mail.com" required>
+    <p class="muted" style="margin:6px 0 0;">Te mandamos ahí el link para administrar el regalo — es tu forma de recuperarlo si perdés la página.</p>
+
     <label for="min_contribution">Aporte mínimo sugerido (UYU)</label>
     <input type="number" id="min_contribution" name="min_contribution" placeholder="Ej: 400" min="1" required>
+
+    <label for="bank_details">Datos para transferir (banco, tipo de cuenta, número, titular)</label>
+    <textarea id="bank_details" name="bank_details" rows="4" placeholder="Ej: BROU, Caja de Ahorros en pesos, cuenta 001234567, titular Martina Pérez" required style="width:100%; padding:13px 14px; font-size:15px; font-family:'Inter',sans-serif; border:1.4px solid var(--line); background:#fff; color:var(--navy); border-radius:2px; resize:vertical;"></textarea>
+    <p class="muted" style="margin:6px 0 0;">Esto lo va a ver cada persona que elija aportar por transferencia — poné todo lo necesario para que no tenga dudas de a dónde mandar la plata.</p>
 
     <button class="btn" type="submit">Crear regalo</button>
   </form>

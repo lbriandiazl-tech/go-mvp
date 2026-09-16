@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}Revisá tu mail — Vaka{% endblock %}
+{% block bodyclass %}navy-page{% endblock %}
+{% block content %}
+<div class="wrap" style="text-align:center; padding-top:110px;">
+  <div class="wordmark">Vaka</div>
+  <h1 class="headline">Revisá tu mail</h1>
+  <p class="subline">Si ese mail organizó algún regalo acá, le acabamos de mandar los links. Puede tardar un par de minutos — revisá también la carpeta de spam la primera vez.</p>
+  <a class="btn btn-ghost" href="{{ url_for('home') }}">Volver al inicio</a>
+</div>
+{% endblock %}

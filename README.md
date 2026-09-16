@@ -58,6 +58,30 @@ si Mercado Pago no responde (cae a transferencia con un aviso, no
 rompe), y que el webhook confirma el aporte correctamente y no se
 duplica si llega dos veces.
 
+## Mails (recuperación de acceso del organizador)
+
+Si configurás `RESEND_API_KEY` (Render > Environment), pasan dos cosas:
+1. Al crear un regalo, el organizador recibe por mail el link a su panel
+2. Aparece disponible `/recuperar` — si alguien pierde el link, pone su
+   mail y le reenviamos los links de sus regalos
+
+Sin esa variable configurada, la app funciona exactamente igual pero sin
+estas dos funciones (no se manda ningún mail, y `/recuperar` muestra un
+aviso de que todavía no está activo).
+
+**Cuenta gratis en [resend.com](https://resend.com)** → Developers >
+API Keys → crear una y copiarla. El plan gratis incluye 3.000 mails/mes.
+
+Por defecto los mails salen desde el dominio de prueba de Resend
+(`onboarding@resend.dev`) — funciona para probar, pero cuando Vaka tenga
+dominio propio conviene verificarlo en Resend y configurar
+`RESEND_FROM_EMAIL` con una dirección propia (mejor entregabilidad).
+
+**Mismo aviso que con Mercado Pago**: este módulo se escribió siguiendo
+la documentación oficial pero no se pudo probar contra la API real en el
+entorno de desarrollo. Sí se probó toda la lógica interna (qué pasa si
+Resend no responde: no rompe nada, solo no manda el mail).
+
 ## Lo que falta para producción
 
 - Catálogo real (hoy `/regalo/<slug>/catalogo` es un placeholder)

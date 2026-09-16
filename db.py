@@ -40,7 +40,9 @@ CREATE TABLE IF NOT EXISTS gifts (
     recipient_name TEXT NOT NULL,
     occasion TEXT NOT NULL,
     organizer_name TEXT NOT NULL,
+    organizer_email TEXT NOT NULL DEFAULT '',
     min_contribution INTEGER NOT NULL,
+    bank_details TEXT NOT NULL DEFAULT '',
     currency TEXT NOT NULL DEFAULT 'UYU',
     status TEXT NOT NULL DEFAULT 'open',
     created_at TEXT NOT NULL,
@@ -86,6 +88,8 @@ def _migrate():
         ("gifts", "min_contribution", "INTEGER"),
         ("gifts", "selected_category", "TEXT"),
         ("gifts", "selected_item", "TEXT"),
+        ("gifts", "bank_details", "TEXT NOT NULL DEFAULT ''"),
+        ("gifts", "organizer_email", "TEXT NOT NULL DEFAULT ''"),
         ("contributions", "payment_method", "TEXT NOT NULL DEFAULT 'transfer'"),
         ("contributions", "mp_preference_id", "TEXT"),
         ("contributions", "mp_payment_id", "TEXT"),
@@ -155,18 +159,20 @@ def _now():
 
 # ---------- regalos ----------
 
-def create_gift(recipient_name, occasion, organizer_name, min_contribution, currency="UYU"):
+def create_gift(recipient_name, occasion, organizer_name, organizer_email, min_contribution, bank_details, currency="UYU"):
     slug = new_slug(recipient_name)
     token = new_token()
     with engine.begin() as conn:
         conn.execute(
             text("""INSERT INTO gifts
-                   (slug, organizer_token, recipient_name, occasion, organizer_name,
-                    min_contribution, currency, status, created_at)
-                   VALUES (:slug, :token, :recipient_name, :occasion, :organizer_name,
-                           :min_contribution, :currency, 'open', :created_at)"""),
+                   (slug, organizer_token, recipient_name, occasion, organizer_name, organizer_email,
+                    min_contribution, bank_details, currency, status, created_at)
+                   VALUES (:slug, :token, :recipient_name, :occasion, :organizer_name, :organizer_email,
+                           :min_contribution, :bank_details, :currency, 'open', :created_at)"""),
             dict(slug=slug, token=token, recipient_name=recipient_name, occasion=occasion,
-                 organizer_name=organizer_name, min_contribution=min_contribution, currency=currency,
+                 organizer_name=organizer_name, organizer_email=organizer_email,
+                 min_contribution=min_contribution,
+                 bank_details=bank_details, currency=currency,
                  created_at=_now()),
         )
     return slug, token
@@ -304,3 +310,12 @@ def suggested_amounts(min_contribution):
         rounded = round(raw / 100) * 100
         amounts.append(int(rounded))
     return amounts
+
+
+def get_gifts_by_organizer_email(email):
+    with engine.connect() as conn:
+        result = conn.execute(
+            text("SELECT * FROM gifts WHERE organizer_email = :email ORDER BY created_at DESC"),
+            dict(email=email.strip().lower()),
+        )
+        return _rows(result)
