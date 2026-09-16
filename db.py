@@ -70,6 +70,44 @@ def init_db():
             statement = statement.strip()
             if statement:
                 conn.execute(text(statement))
+    _migrate()
+
+
+def _migrate():
+    """Agrega columnas que puedan faltar en una base creada con una
+    versión anterior del esquema, sin perder los datos existentes.
+
+    Por qué hace falta esto: CREATE TABLE IF NOT EXISTS no toca una
+    tabla que ya existe, así que si el código cambia (se agrega una
+    columna, se renombra un campo) la base real en producción se
+    queda atrás hasta que alguien la migre a mano. Esto lo hace
+    solo, cada vez que arranca el servidor."""
+    additions = [
+        ("gifts", "min_contribution", "INTEGER"),
+        ("gifts", "selected_category", "TEXT"),
+        ("gifts", "selected_item", "TEXT"),
+        ("contributions", "payment_method", "TEXT NOT NULL DEFAULT 'transfer'"),
+        ("contributions", "mp_preference_id", "TEXT"),
+        ("contributions", "mp_payment_id", "TEXT"),
+    ]
+    for table, column, coltype in additions:
+        try:
+            with engine.begin() as conn:
+                conn.execute(text(f"ALTER TABLE {table} ADD COLUMN {column} {coltype}"))
+        except Exception:
+            pass  # la columna ya existe — nada que hacer
+
+    # Migración específica: si esta base venía del esquema viejo con
+    # "goal_amount", copiar esos valores a "min_contribution" antes de
+    # que el campo viejo quede huérfano.
+    try:
+        with engine.begin() as conn:
+            conn.execute(text(
+                "UPDATE gifts SET min_contribution = goal_amount "
+                "WHERE min_contribution IS NULL AND goal_amount IS NOT NULL"
+            ))
+    except Exception:
+        pass  # esta base nunca tuvo "goal_amount" — no hay nada que migrar
 
 
 def _row(result):
