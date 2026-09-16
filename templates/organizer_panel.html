@@ -1,11 +1,17 @@
 {% extends "base.html" %}
-{% block title %}Panel del organizador — GO{% endblock %}
+{% block title %}Panel del organizador — Vaka{% endblock %}
 {% block bodyclass %}paper-page{% endblock %}
 {% block content %}
 <div class="wrap" style="max-width:560px;">
-  <div class="wordmark" style="color:var(--gold);">GO</div>
+  <div class="wordmark" style="color:var(--gold);">Vaka</div>
   <h1 class="headline">{{ gift.occasion }}</h1>
   <p class="subline">Panel del organizador · solo vos ves esta página</p>
+
+  <div class="card" style="border-color:var(--gold); background:rgba(185,141,52,0.08);">
+    <p style="margin:0 0 8px; font-weight:700; color:var(--navy); font-size:13.5px;">⚠️ Guardá este link</p>
+    <p class="muted" style="margin:0 0 12px;">Es la única forma de volver a administrar este regalo — no hay usuario ni contraseña. Si cerrás esta página sin guardarlo, no vas a poder confirmar aportes ni cerrar la colecta.</p>
+    <button type="button" onclick="copyOrganizerLink()" class="btn" style="margin-top:0;">Copiar este link</button>
+  </div>
 
   <div class="card">
     <div style="display:flex; justify-content:space-between; font-size:13.5px;">
@@ -26,18 +32,19 @@
   </div>
 
   <h2 class="serif" style="font-size:17px; margin:30px 0 4px;">Aportes</h2>
-  <p class="muted" style="margin:0 0 4px;">Confirmá cada uno cuando veas la transferencia en tu cuenta, buscando la referencia.</p>
+  <p class="muted" style="margin:0 0 4px;">Los pagos con Mercado Pago se confirman solos. Los de transferencia los confirmás vos cuando veas el dinero en tu cuenta, buscando la referencia.</p>
 
   {% if contributions %}
   <table>
     <thead>
-      <tr><th>Quién</th><th>Monto</th><th>Referencia</th><th>Estado</th><th></th></tr>
+      <tr><th>Quién</th><th>Monto</th><th>Medio</th><th>Referencia</th><th>Estado</th><th></th></tr>
     </thead>
     <tbody>
       {% for c in contributions %}
       <tr>
         <td>{{ c.contributor_name }}</td>
         <td>${{ "{:,}".format(c.amount).replace(",", ".") }}</td>
+        <td>{{ "Mercado Pago" if c.payment_method == "mercadopago" else "Transferencia" }}</td>
         <td><code class="ref">{{ c.reference_code }}</code></td>
         <td>
           {% if c.status == 'confirmed' %}
@@ -47,7 +54,7 @@
           {% endif %}
         </td>
         <td>
-          {% if c.status == 'pending' and gift.status == 'open' %}
+          {% if c.status == 'pending' and gift.status == 'open' and c.payment_method != 'mercadopago' %}
           <form method="POST" action="{{ url_for('validate_contribution', slug=gift.slug, contribution_id=c.id, token=token) }}">
             <button class="btn btn-small" type="submit">Confirmar</button>
           </form>
@@ -72,4 +79,31 @@
   </div>
   {% endif %}
 </div>
+
+<script>
+  const shareUrl = {{ share_url | tojson }};
+  const slug = {{ gift.slug | tojson }};
+  const occasion = {{ gift.occasion | tojson }};
+  const organizerUrl = window.location.href;
+
+  function copyOrganizerLink(){
+    navigator.clipboard.writeText(organizerUrl).then(() => {
+      alert('Link copiado. Guardalo en un lugar seguro (notas, mensaje a vos mismo).');
+    }).catch(() => {
+      prompt('Copiá este link manualmente:', organizerUrl);
+    });
+  }
+
+  // Recuerda este regalo en este navegador para que la home lo pueda
+  // mostrar de nuevo si cerrás esta pestaña sin guardar el link.
+  try {
+    const key = 'go_organized_gifts';
+    const saved = JSON.parse(localStorage.getItem(key) || '[]');
+    const exists = saved.some(g => g.slug === slug);
+    if(!exists){
+      saved.unshift({ slug, occasion, url: organizerUrl, savedAt: Date.now() });
+      localStorage.setItem(key, JSON.stringify(saved.slice(0, 10)));
+    }
+  } catch(e) { /* localStorage puede fallar en modo privado, no es crítico */ }
+</script>
 {% endblock %}

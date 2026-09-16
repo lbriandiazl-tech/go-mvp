@@ -1,5 +1,5 @@
 """
-GO — capa de datos.
+Vaka — capa de datos.
 
 Usa SQLAlchemy Core como capa fina sobre SQL crudo: el mismo código
 funciona contra SQLite (desarrollo local, sin nada que instalar) y
@@ -55,6 +55,9 @@ CREATE TABLE IF NOT EXISTS contributions (
     amount INTEGER NOT NULL,
     reference_code TEXT UNIQUE NOT NULL,
     status TEXT NOT NULL DEFAULT 'pending',
+    payment_method TEXT NOT NULL DEFAULT 'transfer',
+    mp_preference_id TEXT,
+    mp_payment_id TEXT,
     created_at TEXT NOT NULL,
     confirmed_at TEXT
 );
@@ -96,7 +99,7 @@ def new_token():
 
 
 def new_reference_code():
-    return "GO-" + _random_code(6, string.ascii_uppercase + string.digits)
+    return "VK-" + _random_code(6, string.ascii_uppercase + string.digits)
 
 
 def _now():
@@ -144,15 +147,17 @@ def close_gift(gift_id):
 
 # ---------- aportes ----------
 
-def create_contribution(gift_id, contributor_name, amount):
+def create_contribution(gift_id, contributor_name, amount, payment_method="transfer"):
     ref = new_reference_code()
     with engine.begin() as conn:
         conn.execute(
             text("""INSERT INTO contributions
-                   (gift_id, contributor_name, amount, reference_code, status, created_at)
-                   VALUES (:gift_id, :contributor_name, :amount, :ref, 'pending', :created_at)"""),
+                   (gift_id, contributor_name, amount, reference_code, status,
+                    payment_method, created_at)
+                   VALUES (:gift_id, :contributor_name, :amount, :ref, 'pending',
+                           :payment_method, :created_at)"""),
             dict(gift_id=gift_id, contributor_name=contributor_name, amount=amount,
-                 ref=ref, created_at=_now()),
+                 ref=ref, payment_method=payment_method, created_at=_now()),
         )
     return ref
 
@@ -200,6 +205,36 @@ def get_contribution(contribution_id):
             text("SELECT * FROM contributions WHERE id = :id"), dict(id=contribution_id)
         )
         return _row(result)
+
+
+def get_contribution_by_reference(reference_code):
+    with engine.connect() as conn:
+        result = conn.execute(
+            text("SELECT * FROM contributions WHERE reference_code = :ref"),
+            dict(ref=reference_code),
+        )
+        return _row(result)
+
+
+def set_mp_preference(contribution_id, preference_id):
+    with engine.begin() as conn:
+        conn.execute(
+            text("UPDATE contributions SET mp_preference_id = :pid WHERE id = :id"),
+            dict(pid=preference_id, id=contribution_id),
+        )
+
+
+def confirm_contribution_by_mp(reference_code, mp_payment_id):
+    """Confirma un aporte automáticamente a partir del webhook de Mercado Pago.
+    Idempotente: si ya estaba confirmado, no hace nada (un webhook puede
+    llegar más de una vez para el mismo pago — es normal en MP)."""
+    with engine.begin() as conn:
+        conn.execute(
+            text("""UPDATE contributions
+                   SET status = 'confirmed', confirmed_at = :now, mp_payment_id = :pid
+                   WHERE reference_code = :ref AND status != 'confirmed'"""),
+            dict(now=_now(), pid=mp_payment_id, ref=reference_code),
+        )
 
 
 def set_selected_item(gift_id, category, item_title):

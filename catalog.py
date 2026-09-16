@@ -1,5 +1,5 @@
 """
-GO — catálogo de experiencias.
+Vaka — catálogo de experiencias.
 
 Cargado a mano para el MVP (según lo definido: catálogo reducido,
 curado). Cuando esto crezca, se reemplaza por una tabla en la base

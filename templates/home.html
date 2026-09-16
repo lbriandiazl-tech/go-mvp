@@ -1,47 +1,121 @@
 {% extends "base.html" %}
-{% block title %}GO — Regalos en grupo{% endblock %}
+{% block title %}Vaka — Regalos en grupo{% endblock %}
 {% block bodyclass %}navy-page{% endblock %}
 {% block content %}
 <div class="wrap" style="padding-top:90px; text-align:center;">
-  <div class="wordmark">GO</div>
+  <div class="wordmark">Vaka</div>
 
-  <div class="hero-icon">
-    <svg viewBox="0 0 48 48">
-      <path d="M9 41 V23 H6 V18 H42 V23 H39 V41 Z"/>
-      <path d="M21 18 V41 M27 18 V41"/>
-      <path d="M24 18c-4-7-13-5-12 0 c0.6 3 5 3.5 9 2 M24 18c4-7 13-5 12 0 c-0.6 3-5 3.5-9 2"/>
-    </svg>
+  <div class="intro-video">
+    <div class="frame" id="introFrame">
+
+  <div class="wordmark">Vaka</div>
+
+  <!-- Escena 1 — intro -->
+  <div class="scene scene1" data-scene="0">
+    <div class="icon">
+      <svg viewBox="0 0 48 48"><rect x="10" y="20" width="28" height="20" rx="1"/><path d="M10 26 h28"/><rect x="21" y="20" width="6" height="20"/><path d="M24 20c-3-6-12-6-12 0h12zm0 0c3-6 12-6 12 0h-12z"/></svg>
+    </div>
+    <div class="headline">Un regalo,<br>armado entre todos</div>
+    <div class="rule"></div>
+    <div class="subline">Fácil de organizar,<br>ágil y rápido</div>
   </div>
 
-  <h1 class="headline">Un regalo,<br>armado entre todos</h1>
-  <p class="subline">Fácil de organizar, ágil y rápido.<br>Coordiná la vaquita para ese regalo grupal sin más idas y vueltas por WhatsApp.</p>
-  <a class="btn" href="{{ url_for('create_gift') }}">Crear un regalo</a>
-
-  <!-- Cómo funciona -->
-  <div class="section">
-    <div class="section-title">Así funciona</div>
-    <div class="steps3">
-      <div class="step3">
-        <div class="step3-num">01</div>
-        <div class="step3-icon"><svg viewBox="0 0 30 30"><circle cx="15" cy="10" r="5"/><path d="M6 25c0-6 4-10 9-10s9 4 9 10"/></svg></div>
-        <div class="step3-label">Creás el regalo<br>en un minuto</div>
+  <!-- Escena 2 — pasos -->
+  <div class="scene scene2" data-scene="1">
+    <div class="headline" style="font-size:18px;">Así funciona</div>
+    <div class="process">
+      <div class="p-step">
+        <div class="p-num">01</div>
+        <div class="p-icon"><svg viewBox="0 0 30 30"><circle cx="15" cy="10" r="5"/><path d="M6 25c0-6 4-10 9-10s9 4 9 10"/></svg></div>
+        <div class="p-connector"></div>
+        <div class="p-label">Aportás<br>tu parte</div>
       </div>
-      <div class="step3">
-        <div class="step3-num">02</div>
-        <div class="step3-icon"><svg viewBox="0 0 30 30"><circle cx="15" cy="15" r="4"/><circle cx="6" cy="8" r="2.2"/><circle cx="24" cy="8" r="2.2"/><circle cx="15" cy="25" r="2.2"/><path d="M8 10l5 3M22 10l-5 3M15 21v2"/></svg></div>
-        <div class="step3-label">Compartís el link,<br>todos aportan</div>
+      <div class="p-step">
+        <div class="p-num">02</div>
+        <div class="p-icon"><svg viewBox="0 0 30 30"><circle cx="15" cy="15" r="4"/><circle cx="6" cy="8" r="2.2"/><circle cx="24" cy="8" r="2.2"/><circle cx="15" cy="25" r="2.2"/><path d="M8 10l5 3M22 10l-5 3M15 21v2"/></svg></div>
+        <div class="p-connector"></div>
+        <div class="p-label">Se reúne<br>el total</div>
       </div>
-      <div class="step3">
-        <div class="step3-num">03</div>
-        <div class="step3-icon"><svg viewBox="0 0 30 30"><rect x="6" y="12" width="18" height="13" rx="1"/><path d="M6 17h18M15 12v13"/><path d="M15 12c-2-4-8-4-8 0h8zm0 0c2-4 8-4 8 0h-8z"/></svg></div>
-        <div class="step3-label">Se cierra y elige<br>cómo disfrutarlo</div>
+      <div class="p-step">
+        <div class="p-num">03</div>
+        <div class="p-icon"><svg viewBox="0 0 30 30"><rect x="6" y="12" width="18" height="13" rx="1"/><path d="M6 17h18M15 12v13"/><path d="M15 12c-2-4-8-4-8 0h8zm0 0c2-4 8-4 8 0h-8z"/></svg></div>
+        <div class="p-connector"></div>
+        <div class="p-label">Se entrega<br>el regalo</div>
       </div>
     </div>
   </div>
 
-  <!-- Por qué GO -->
+  <!-- Escena 3 — privacidad -->
+  <div class="scene scene3" data-scene="2">
+    <div class="icon">
+      <svg viewBox="0 0 48 48"><path d="M24 6l16 6v10c0 11-7 17-16 20-9-3-16-9-16-20V12z"/><path d="M17 24l5 5 9-10"/></svg>
+    </div>
+    <div class="headline">Tu aporte,<br>protegido</div>
+    <div class="rule"></div>
+    <div class="subline">Ni los demás participantes ni el<br>organizador ven cuánto pusiste</div>
+  </div>
+
+  <!-- Escena 4 — organizador -->
+  <div class="scene scene4" data-scene="3">
+    <div class="headline" style="font-size:18px;">Quién coordina<br>este regalo</div>
+    <div class="org-card">
+      <div class="org-avatar"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.3"/><path d="M5 20c0-4 3-7 7-7s7 3 7 7"/></svg></div>
+      <div class="org-text">
+        <div class="org-name">Martina Pérez</div>
+        <div class="org-occasion">Cumpleaños de Juan</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Escena 5 — unboxing / reveal -->
+  <div class="scene scene5" data-scene="4">
+    <div class="headline" style="font-size:18px;">Así elige Juan<br>cómo disfrutarlo</div>
+    <div class="unbox-stage">
+      <div class="box-side"></div>
+      <div class="box-base"></div>
+      <div class="ribbon-h"></div>
+      <div class="ribbon-v"></div>
+      <div class="box-lid"></div>
+      <div class="bow">
+        <svg viewBox="0 0 32 26"><path d="M16 13c-4-9-14-6-13 0s8 4 13 0zM16 13c4-9 14-6 13 0s-8 4-13 0z"/><path d="M16 13l-4 10M16 13l4 10"/><circle cx="16" cy="13" r="2.2"/></svg>
+      </div>
+      <div class="glow"></div>
+      <div class="reveal-cards">
+        <div class="r-card"><svg viewBox="0 0 24 24"><path d="M2 13l19-9-8 19-3-8-8-2z"/></svg><span>Viajes</span></div>
+        <div class="r-card"><svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="1.4"/><path d="M12 6.5v2M4 20l8-7 8 7M4 20h16"/></svg><span>Indumentaria</span></div>
+        <div class="r-card"><svg viewBox="0 0 24 24"><path d="M6 2v7c0 1.5 1 2 1 3v10M9 2v7c0 1.5-1 2-1 3M17 2c1.5 2 1.5 6 0 8v12"/></svg><span>Gastronomía</span></div>
+        <div class="r-card"><svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="10" rx="1"/><path d="M12 7v10" stroke-dasharray="2 2"/></svg><span>Espectáculos</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Escena 6 — CTA + cierre de marca -->
+  <div class="scene scene6" data-scene="5">
+    <div class="headline">Todo listo.</div>
+    <div class="cta-btn">Aportar ahora →</div>
+    <div class="cta-note"><span>Menos de un minuto</span><span class="note-sep"></span><span>Pago seguro</span></div>
+    <div class="brand-sign">
+      <div class="brand-rule"></div>
+      <div class="brand-word">Vaka</div>
+      <div class="brand-tagline">Regalos en grupo</div>
+    </div>
+  </div>
+
+    </div>
+  </div>
+
+  <h1 style="position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0);">Vaka — Un regalo, armado entre todos</h1>
+  <p class="subline" style="margin-top:26px;">Coordiná la vaquita para ese regalo grupal sin más idas y vueltas por WhatsApp.</p>
+  <a class="btn" href="{{ url_for('create_gift') }}">Crear un regalo</a>
+
+  <div id="my-gifts" style="display:none; margin-top:32px; text-align:left;">
+    <p class="muted" style="text-align:center; margin-bottom:12px;">Regalos que organizaste desde este dispositivo</p>
+    <div id="my-gifts-list"></div>
+  </div>
+
+  <!-- Por qué Vaka -->
   <div class="section">
-    <div class="section-title">Por qué GO</div>
+    <div class="section-title">Por qué Vaka</div>
     <div style="text-align:left;">
       <div class="feature-row">
         <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M12 3l8 3v5c0 5.5-3.5 8.5-8 10-4.5-1.5-8-4.5-8-10V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg></div>
@@ -67,7 +141,7 @@
     <div class="section-title">Preguntas frecuentes</div>
     <div style="text-align:left;">
       <details class="faq">
-        <summary>¿GO es gratis?</summary>
+        <summary>¿Vaka es gratis?</summary>
         <p>Sí, crear y organizar un regalo no tiene costo. No hay suscripciones ni planes.</p>
       </details>
       <details class="faq">
@@ -93,4 +167,63 @@
     <a class="btn" href="{{ url_for('create_gift') }}">Crear un regalo</a>
   </div>
 </div>
+
+<script>
+(function(){
+
+  const scenes = document.querySelectorAll('.scene');
+  const durations = [3400, 3800, 3800, 3400, 4400, 3200];
+  let current = -1;
+  let timer;
+
+  function showScene(i){
+    scenes.forEach((s, idx) => {
+      s.classList.remove('active');
+      if(idx === i){
+        s.querySelectorAll('*').forEach(el=>{
+          el.style.animation = 'none';
+          void el.offsetWidth;
+          el.style.animation = '';
+        });
+        s.classList.add('active');
+      }
+    });
+  }
+
+  function next(){
+    current = (current + 1) % scenes.length;
+    showScene(current);
+    timer = setTimeout(next, durations[current]);
+  }
+
+  function restart(){
+    clearTimeout(timer);
+    current = -1;
+    next();
+  }
+
+  // Reinicio silencioso para revisión interna — no visible en el video final
+  document.addEventListener('keydown', e => { if(e.key === 'r') restart(); });
+
+  next();
+
+})();
+</script>
+<script>
+  try {
+    const saved = JSON.parse(localStorage.getItem('go_organized_gifts') || '[]');
+    if(saved.length > 0){
+      const box = document.getElementById('my-gifts');
+      const list = document.getElementById('my-gifts-list');
+      saved.forEach(g => {
+        const row = document.createElement('a');
+        row.href = g.url;
+        row.style.cssText = 'display:block; padding:14px 16px; border:1px solid var(--line-dark); margin-bottom:8px; color:var(--cream); text-decoration:none; font-size:13.5px;';
+        row.textContent = g.occasion;
+        list.appendChild(row);
+      });
+      box.style.display = 'block';
+    }
+  } catch(e) {}
+</script>
 {% endblock %}

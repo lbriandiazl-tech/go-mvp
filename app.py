@@ -3,6 +3,7 @@ from urllib.parse import quote
 from flask import Flask, render_template, request, redirect, url_for, abort, flash
 import db
 import catalog
+import mercadopago_client
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "dev-only-change-in-production")
@@ -69,15 +70,71 @@ def contribute(slug):
             amount = int(request.form["amount"])
         except (ValueError, KeyError):
             amount = 0
+        payment_method = request.form.get("payment_method", "transfer")
 
         if not (contributor_name and amount > 0):
             flash("Ingresá tu nombre y un monto válido.")
-            return render_template("contribute.html", gift=gift)
+            return render_template("contribute.html", gift=gift, mp_enabled=mercadopago_client.is_configured())
 
-        ref = db.create_contribution(gift["id"], contributor_name, amount)
+        if payment_method == "mercadopago" and mercadopago_client.is_configured():
+            ref = db.create_contribution(gift["id"], contributor_name, amount, payment_method="mercadopago")
+            contribution = db.get_contribution_by_reference(ref)
+            try:
+                pref_id, init_point = mercadopago_client.create_preference(
+                    reference_code=ref,
+                    title=f"Aporte para {gift['occasion']} (Vaka)",
+                    amount=amount,
+                    success_url=url_for("payment_result", slug=slug, result="success", _external=True),
+                    failure_url=url_for("payment_result", slug=slug, result="failure", _external=True),
+                    pending_url=url_for("payment_result", slug=slug, result="pending", _external=True),
+                    notification_url=url_for("mercadopago_webhook", _external=True),
+                )
+                db.set_mp_preference(contribution["id"], pref_id)
+                return redirect(init_point)
+            except mercadopago_client.MercadoPagoError as e:
+                flash(f"No se pudo iniciar el pago con Mercado Pago ({e}). Probá con transferencia bancaria.")
+                return render_template("contribute.html", gift=gift, mp_enabled=mercadopago_client.is_configured())
+
+        ref = db.create_contribution(gift["id"], contributor_name, amount, payment_method="transfer")
         return render_template("contribute_instructions.html", gift=gift, amount=amount, ref=ref)
 
-    return render_template("contribute.html", gift=gift)
+    return render_template("contribute.html", gift=gift, mp_enabled=mercadopago_client.is_configured())
+
+
+@app.route("/g/<slug>/pago/<result>", methods=["GET"])
+def payment_result(slug, result):
+    gift = db.get_gift_by_slug(slug)
+    if not gift:
+        abort(404)
+    return render_template("payment_result.html", gift=gift, result=result)
+
+
+@app.route("/webhooks/mercadopago", methods=["POST"])
+def mercadopago_webhook():
+    """Mercado Pago llama acá cuando cambia el estado de un pago.
+    Por seguridad, NO confiamos en el contenido de esta notificación:
+    volvemos a preguntarle a la API de MP el estado real del pago antes
+    de confirmar nada en nuestra base."""
+    payment_id = request.args.get("data.id") or (request.get_json(silent=True) or {}).get("data", {}).get("id")
+    topic = request.args.get("type") or (request.get_json(silent=True) or {}).get("type")
+
+    if topic != "payment" or not payment_id:
+        return "", 200  # ignoramos otros tipos de notificación
+
+    try:
+        payment = mercadopago_client.get_payment(payment_id)
+    except mercadopago_client.MercadoPagoError:
+        # Devolvemos 200 igual: si le devolvemos error, MP reintenta
+        # infinitamente. Mejor loguear y seguir (no tenemos logging
+        # todavía — próximo paso).
+        return "", 200
+
+    if payment.get("status") == "approved":
+        reference_code = payment.get("external_reference")
+        if reference_code:
+            db.confirm_contribution_by_mp(reference_code, payment_id)
+
+    return "", 200
 
 
 # ---------------------------------------------------------------

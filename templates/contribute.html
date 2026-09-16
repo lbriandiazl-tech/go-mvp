@@ -1,9 +1,9 @@
 {% extends "base.html" %}
-{% block title %}Aportar — GO{% endblock %}
+{% block title %}Aportar — Vaka{% endblock %}
 {% block bodyclass %}paper-page{% endblock %}
 {% block content %}
 <div class="wrap">
-  <div class="wordmark" style="color:var(--gold);">GO</div>
+  <div class="wordmark" style="color:var(--gold);">Vaka</div>
   <h1 class="headline">Sumá tu aporte</h1>
   <p class="subline">Para {{ gift.occasion }}. Tu monto es privado — ni los demás participantes ni el organizador lo ven, solo que ya aportaste.</p>
 
@@ -17,6 +17,28 @@
 
     <label for="amount">Monto a aportar (UYU)</label>
     <input type="number" id="amount" name="amount" placeholder="Ej: 1500" min="1" required>
+
+    {% if mp_enabled %}
+    <label>Cómo querés pagar</label>
+    <div style="display:flex; flex-direction:column; gap:10px; margin-top:6px;">
+      <label class="card" style="display:flex; align-items:center; gap:12px; cursor:pointer; margin-top:0; padding:14px 16px;">
+        <input type="radio" name="payment_method" value="mercadopago" checked style="width:auto;">
+        <span>
+          <strong style="display:block; font-size:13.5px;">Mercado Pago</strong>
+          <span class="sub" style="font-size:12px;">Tarjeta o saldo — se confirma solo, al instante</span>
+        </span>
+      </label>
+      <label class="card" style="display:flex; align-items:center; gap:12px; cursor:pointer; margin-top:0; padding:14px 16px;">
+        <input type="radio" name="payment_method" value="transfer" style="width:auto;">
+        <span>
+          <strong style="display:block; font-size:13.5px;">Transferencia bancaria</strong>
+          <span class="sub" style="font-size:12px;">El organizador la confirma a mano</span>
+        </span>
+      </label>
+    </div>
+    {% else %}
+    <input type="hidden" name="payment_method" value="transfer">
+    {% endif %}
 
     <button class="btn" type="submit">Continuar →</button>
   </form>

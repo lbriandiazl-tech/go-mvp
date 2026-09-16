@@ -1,4 +1,4 @@
-# GO — MVP
+# Vaka — MVP
 
 Plataforma de regalos grupales. Flask + SQLAlchemy (SQLite en local,
 Postgres en producción).
@@ -40,6 +40,23 @@ no hace falta configurar nada más.
    manualmente cada transferencia, cerrar la colecta
 5. `/regalo/<slug>` — experiencia del destinatario: abre la caja (interactivo,
    no automático) y elige una categoría del catálogo
+
+## Mercado Pago (pago automático)
+
+Si configurás `MP_ACCESS_TOKEN` (Render > Environment), el formulario de
+aportar ofrece "Pagar con Mercado Pago" además de transferencia bancaria.
+Los pagos se confirman solos vía webhook — nadie tiene que revisar el
+banco a mano para esos.
+
+**Antes de usar credenciales de producción**: probá primero con las
+credenciales de PRUEBA de Mercado Pago (Developers > Credenciales de
+prueba) y el flujo completo de un aporte de punta a punta. Esta
+integración se escribió siguiendo la documentación oficial pero no se
+pudo probar contra la API real en el entorno de desarrollo (sin acceso
+a internet) — lo que sí se probó fue toda la lógica interna: qué pasa
+si Mercado Pago no responde (cae a transferencia con un aviso, no
+rompe), y que el webhook confirma el aporte correctamente y no se
+duplica si llega dos veces.
 
 ## Lo que falta para producción
 

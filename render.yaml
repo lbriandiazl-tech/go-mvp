@@ -12,6 +12,8 @@ services:
         fromDatabase:
           name: go-mvp-db
           property: connectionString
+      - key: MP_ACCESS_TOKEN
+        sync: false
 
 databases:
   - name: go-mvp-db
