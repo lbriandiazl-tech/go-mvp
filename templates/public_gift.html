@@ -22,11 +22,10 @@
 
   <div class="card" style="text-align:left;">
     <div style="display:flex; justify-content:space-between; font-size:13.5px;">
-      <span>Juntado</span>
-      <span><strong>${{ "{:,}".format(total).replace(",", ".") }}</strong> de ${{ "{:,}".format(gift.goal_amount).replace(",", ".") }}</span>
+      <span>Juntado hasta ahora</span>
+      <span><strong>${{ "{:,}".format(total).replace(",", ".") }}</strong></span>
     </div>
-    <div class="progress-track"><div class="progress-fill" style="width:{{ pct }}%;"></div></div>
-    <p class="muted" style="margin:0;">{{ pct }}% de la meta</p>
+    <p class="muted" style="margin:10px 0 0;">Aporte sugerido desde ${{ "{:,}".format(gift.min_contribution).replace(",", ".") }}</p>
   </div>
 
   {% if gift.status == 'open' %}

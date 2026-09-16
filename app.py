@@ -28,15 +28,15 @@ def create_gift():
         occasion = request.form["occasion"].strip()
         organizer_name = request.form["organizer_name"].strip()
         try:
-            goal_amount = int(request.form["goal_amount"])
+            min_contribution = int(request.form["min_contribution"])
         except (ValueError, KeyError):
-            goal_amount = 0
+            min_contribution = 0
 
-        if not (recipient_name and occasion and organizer_name and goal_amount > 0):
+        if not (recipient_name and occasion and organizer_name and min_contribution > 0):
             flash("Completá todos los campos para crear el regalo.")
             return render_template("create_gift.html")
 
-        slug, token = db.create_gift(recipient_name, occasion, organizer_name, goal_amount)
+        slug, token = db.create_gift(recipient_name, occasion, organizer_name, min_contribution)
         return redirect(url_for("organizer_panel", slug=slug, token=token))
 
     return render_template("create_gift.html")
@@ -52,8 +52,7 @@ def public_gift(slug):
     if not gift:
         abort(404)
     total = db.confirmed_total(gift["id"])
-    pct = min(100, int(total / gift["goal_amount"] * 100)) if gift["goal_amount"] else 0
-    return render_template("public_gift.html", gift=gift, total=total, pct=pct)
+    return render_template("public_gift.html", gift=gift, total=total)
 
 
 @app.route("/g/<slug>/aportar", methods=["GET", "POST"])
@@ -63,6 +62,8 @@ def contribute(slug):
         abort(404)
     if gift["status"] != "open":
         return render_template("closed.html", gift=gift)
+
+    suggested = db.suggested_amounts(gift["min_contribution"])
 
     if request.method == "POST":
         contributor_name = request.form["contributor_name"].strip()
@@ -74,7 +75,7 @@ def contribute(slug):
 
         if not (contributor_name and amount > 0):
             flash("Ingresá tu nombre y un monto válido.")
-            return render_template("contribute.html", gift=gift, mp_enabled=mercadopago_client.is_configured())
+            return render_template("contribute.html", gift=gift, mp_enabled=mercadopago_client.is_configured(), suggested=suggested)
 
         if payment_method == "mercadopago" and mercadopago_client.is_configured():
             ref = db.create_contribution(gift["id"], contributor_name, amount, payment_method="mercadopago")
@@ -93,12 +94,12 @@ def contribute(slug):
                 return redirect(init_point)
             except mercadopago_client.MercadoPagoError as e:
                 flash(f"No se pudo iniciar el pago con Mercado Pago ({e}). Probá con transferencia bancaria.")
-                return render_template("contribute.html", gift=gift, mp_enabled=mercadopago_client.is_configured())
+                return render_template("contribute.html", gift=gift, mp_enabled=mercadopago_client.is_configured(), suggested=suggested)
 
         ref = db.create_contribution(gift["id"], contributor_name, amount, payment_method="transfer")
         return render_template("contribute_instructions.html", gift=gift, amount=amount, ref=ref)
 
-    return render_template("contribute.html", gift=gift, mp_enabled=mercadopago_client.is_configured())
+    return render_template("contribute.html", gift=gift, mp_enabled=mercadopago_client.is_configured(), suggested=suggested)
 
 
 @app.route("/g/<slug>/pago/<result>", methods=["GET"])
@@ -149,7 +150,6 @@ def organizer_panel(slug):
         abort(404)
     contributions = db.list_contributions(gift["id"])
     total = db.confirmed_total(gift["id"])
-    pct = min(100, int(total / gift["goal_amount"] * 100)) if gift["goal_amount"] else 0
     share_url = url_for("public_gift", slug=slug, _external=True)
     whatsapp_text = (
         f"¡Hola! Estoy juntando un regalo para {gift['occasion']}. "
@@ -158,7 +158,7 @@ def organizer_panel(slug):
     whatsapp_message = quote(whatsapp_text)
     return render_template(
         "organizer_panel.html",
-        gift=gift, contributions=contributions, total=total, pct=pct,
+        gift=gift, contributions=contributions, total=total,
         token=token, share_url=share_url, whatsapp_message=whatsapp_message,
     )
 

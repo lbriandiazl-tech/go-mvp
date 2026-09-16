@@ -11,12 +11,21 @@
     {% if messages %}{% for m in messages %}<div class="flash">{{ m }}</div>{% endfor %}{% endif %}
   {% endwith %}
 
-  <form method="POST">
+  <form method="POST" id="contributeForm">
     <label for="contributor_name">Tu nombre</label>
     <input type="text" id="contributor_name" name="contributor_name" placeholder="Ej: Lucas" required>
 
-    <label for="amount">Monto a aportar (UYU)</label>
-    <input type="number" id="amount" name="amount" placeholder="Ej: 1500" min="1" required>
+    <label>Monto a aportar (UYU)</label>
+    <input type="hidden" id="amount" name="amount" value="">
+    <div class="amount-grid">
+      {% for amt in suggested %}
+      <button type="button" class="amount-btn" data-amount="{{ amt }}">${{ "{:,}".format(amt).replace(",", ".") }}</button>
+      {% endfor %}
+    </div>
+    <button type="button" class="amount-btn-other" id="otherToggle">Otro monto</button>
+    <div id="customWrap" style="display:none; margin-top:10px;">
+      <input type="number" id="customAmount" placeholder="Ej: 1500" min="1">
+    </div>
 
     {% if mp_enabled %}
     <label>Cómo querés pagar</label>
@@ -43,4 +52,40 @@
     <button class="btn" type="submit">Continuar →</button>
   </form>
 </div>
+
+<script>
+  const amountInput = document.getElementById('amount');
+  const buttons = document.querySelectorAll('.amount-btn');
+  const otherBtn = document.getElementById('otherToggle');
+  const customWrap = document.getElementById('customWrap');
+  const customAmount = document.getElementById('customAmount');
+
+  buttons.forEach(b => b.addEventListener('click', () => {
+    buttons.forEach(x => x.classList.remove('selected'));
+    otherBtn.classList.remove('selected');
+    b.classList.add('selected');
+    amountInput.value = b.dataset.amount;
+    customWrap.style.display = 'none';
+    customAmount.value = '';
+  }));
+
+  otherBtn.addEventListener('click', () => {
+    buttons.forEach(x => x.classList.remove('selected'));
+    otherBtn.classList.add('selected');
+    customWrap.style.display = 'block';
+    customAmount.focus();
+    amountInput.value = customAmount.value;
+  });
+
+  customAmount.addEventListener('input', (e) => {
+    amountInput.value = e.target.value;
+  });
+
+  document.getElementById('contributeForm').addEventListener('submit', (e) => {
+    if (!amountInput.value || Number(amountInput.value) <= 0) {
+      e.preventDefault();
+      alert('Elegí un monto o escribí uno en "Otro monto".');
+    }
+  });
+</script>
 {% endblock %}

@@ -40,7 +40,7 @@ CREATE TABLE IF NOT EXISTS gifts (
     recipient_name TEXT NOT NULL,
     occasion TEXT NOT NULL,
     organizer_name TEXT NOT NULL,
-    goal_amount INTEGER NOT NULL,
+    min_contribution INTEGER NOT NULL,
     currency TEXT NOT NULL DEFAULT 'UYU',
     status TEXT NOT NULL DEFAULT 'open',
     created_at TEXT NOT NULL,
@@ -108,18 +108,18 @@ def _now():
 
 # ---------- regalos ----------
 
-def create_gift(recipient_name, occasion, organizer_name, goal_amount, currency="UYU"):
+def create_gift(recipient_name, occasion, organizer_name, min_contribution, currency="UYU"):
     slug = new_slug(recipient_name)
     token = new_token()
     with engine.begin() as conn:
         conn.execute(
             text("""INSERT INTO gifts
                    (slug, organizer_token, recipient_name, occasion, organizer_name,
-                    goal_amount, currency, status, created_at)
+                    min_contribution, currency, status, created_at)
                    VALUES (:slug, :token, :recipient_name, :occasion, :organizer_name,
-                           :goal_amount, :currency, 'open', :created_at)"""),
+                           :min_contribution, :currency, 'open', :created_at)"""),
             dict(slug=slug, token=token, recipient_name=recipient_name, occasion=occasion,
-                 organizer_name=organizer_name, goal_amount=goal_amount, currency=currency,
+                 organizer_name=organizer_name, min_contribution=min_contribution, currency=currency,
                  created_at=_now()),
         )
     return slug, token
@@ -243,3 +243,17 @@ def set_selected_item(gift_id, category, item_title):
             text("UPDATE gifts SET selected_category = :cat, selected_item = :item WHERE id = :id"),
             dict(cat=category, item=item_title, id=gift_id),
         )
+
+
+def suggested_amounts(min_contribution):
+    """4 montos sugeridos a partir del mínimo, para mostrar como botones
+    en vez de que la gente tenga que escribir un número.
+    Con $400 de mínimo da: 400, 600, 1000, 2000 — la misma progresión
+    que usan formularios de donación (ancla baja, media, alta, generosa)."""
+    multipliers = [1, 1.5, 2.5, 5]
+    amounts = []
+    for m in multipliers:
+        raw = min_contribution * m
+        rounded = round(raw / 100) * 100
+        amounts.append(int(rounded))
+    return amounts
