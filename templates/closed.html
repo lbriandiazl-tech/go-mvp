@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Colecta cerrada — GO{% endblock %}
+{% block bodyclass %}navy-page{% endblock %}
+{% block content %}
+<div class="wrap" style="text-align:center; padding-top:120px;">
+  <div class="wordmark">GO</div>
+  <h1 class="headline">Esta colecta ya cerró</h1>
+  <p class="subline">Gracias por las ganas de sumarte — {{ gift.organizer_name }} ya cerró los aportes para {{ gift.occasion }}.</p>
+</div>
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}{{ categoria }} — GO{% endblock %}
+{% block bodyclass %}navy-page{% endblock %}
+{% block content %}
+<div class="wrap" style="max-width:520px;">
+  <div class="wordmark">GO</div>
+  <h1 class="headline">{{ categoria }}</h1>
+  <p class="subline">Elegí lo que más te guste, {{ gift.recipient_name }}.</p>
+
+  {% if items %}
+  <div style="display:flex; flex-direction:column; gap:14px; margin-top:10px;">
+    {% for item in items %}
+    <form method="POST" action="{{ url_for('catalog_select', slug=gift.slug) }}">
+      <input type="hidden" name="categoria" value="{{ categoria }}">
+      <input type="hidden" name="item_title" value="{{ item.title }}">
+      <button type="submit" class="card" style="width:100%; text-align:left; border:1.4px solid var(--line-dark); cursor:pointer; background:rgba(244,239,228,0.04); color:inherit; font-family:inherit;">
+        <div style="font-family:'Fraunces',serif; font-size:16px; color:var(--cream); margin-bottom:6px;">{{ item.title }}</div>
+        <div style="font-size:13px; color:var(--ink-soft); line-height:1.5; margin-bottom:10px;">{{ item.description }}</div>
+        <div style="font-size:12px; color:var(--gold-soft); font-weight:600;">Desde ${{ "{:,}".format(item.price_from).replace(",", ".") }}</div>
+      </button>
+    </form>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p class="muted">Todavía no hay opciones cargadas en esta categoría.</p>
+  {% endif %}
+</div>
+{% endblock %}

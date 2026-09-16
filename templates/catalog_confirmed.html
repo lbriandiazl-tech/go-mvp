@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}¡Listo! — GO{% endblock %}
+{% block bodyclass %}navy-page{% endblock %}
+{% block content %}
+<div class="wrap" style="text-align:center; padding-top:90px;">
+  <div class="wordmark">GO</div>
+
+  <div style="width:70px;height:70px;margin:0 auto 20px;">
+    <svg viewBox="0 0 48 48" style="width:100%;height:100%;">
+      <path fill="none" stroke="#D8B872" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" d="M24 6l16 6v10c0 11-7 17-16 20-9-3-16-9-16-20V12z"/>
+      <path fill="none" stroke="#D8B872" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" d="M17 24l5 5 9-10"/>
+    </svg>
+  </div>
+
+  <h1 class="headline">¡Elegiste tu regalo!</h1>
+  <p class="subline">{{ item.title }} — {{ gift.organizer_name }} y el resto del grupo ya se van a enterar.</p>
+
+  <div class="card" style="text-align:left;">
+    <div style="font-family:'Fraunces',serif; font-size:17px; color:var(--cream); margin-bottom:6px;">{{ item.title }}</div>
+    <div style="font-size:13px; color:var(--ink-soft); line-height:1.5;">{{ item.description }}</div>
+  </div>
+
+  <p class="muted" style="margin-top:24px;">{{ gift.organizer_name }} se va a poner en contacto para coordinar la entrega.</p>
+</div>
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Crear regalo — GO{% endblock %}
+{% block bodyclass %}paper-page{% endblock %}
+{% block content %}
+<div class="wrap">
+  <div class="wordmark" style="color:var(--gold);">GO</div>
+  <h1 class="headline">Armemos el regalo</h1>
+  <p class="subline">Estos datos van a verlos quienes aporten.</p>
+
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}{% for m in messages %}<div class="flash">{{ m }}</div>{% endfor %}{% endif %}
+  {% endwith %}
+
+  <form method="POST">
+    <label for="recipient_name">¿Para quién es el regalo?</label>
+    <input type="text" id="recipient_name" name="recipient_name" placeholder="Ej: Juan" required>
+
+    <label for="occasion">¿Qué se festeja?</label>
+    <input type="text" id="occasion" name="occasion" placeholder="Ej: Cumpleaños de Juan" required>
+
+    <label for="organizer_name">Tu nombre (organizador/a)</label>
+    <input type="text" id="organizer_name" name="organizer_name" placeholder="Ej: Martina Pérez" required>
+
+    <label for="goal_amount">Meta de la colecta (UYU)</label>
+    <input type="number" id="goal_amount" name="goal_amount" placeholder="Ej: 18000" min="1" required>
+
+    <button class="btn" type="submit">Crear regalo</button>
+  </form>
+</div>
+{% endblock %}

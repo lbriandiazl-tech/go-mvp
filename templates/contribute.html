@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Aportar — GO{% endblock %}
+{% block bodyclass %}paper-page{% endblock %}
+{% block content %}
+<div class="wrap">
+  <div class="wordmark" style="color:var(--gold);">GO</div>
+  <h1 class="headline">Sumá tu aporte</h1>
+  <p class="subline">Para {{ gift.occasion }}. Tu monto es privado — ni los demás participantes ni el organizador lo ven, solo que ya aportaste.</p>
+
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}{% for m in messages %}<div class="flash">{{ m }}</div>{% endfor %}{% endif %}
+  {% endwith %}
+
+  <form method="POST">
+    <label for="contributor_name">Tu nombre</label>
+    <input type="text" id="contributor_name" name="contributor_name" placeholder="Ej: Lucas" required>
+
+    <label for="amount">Monto a aportar (UYU)</label>
+    <input type="number" id="amount" name="amount" placeholder="Ej: 1500" min="1" required>
+
+    <button class="btn" type="submit">Continuar →</button>
+  </form>
+</div>
+{% endblock %}

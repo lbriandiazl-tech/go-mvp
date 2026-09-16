@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}{{ gift.occasion }} — GO{% endblock %}
+{% block description %}Organiza {{ gift.organizer_name }} · Sumate a la vaquita para {{ gift.recipient_name }}.{% endblock %}
+{% block og_title %}{{ gift.occasion }} — GO{% endblock %}
+{% block og_description %}Organiza {{ gift.organizer_name }} · Sumate a la vaquita para {{ gift.recipient_name }}.{% endblock %}
+{% block bodyclass %}navy-page{% endblock %}
+{% block content %}
+<div class="wrap" style="text-align:center;">
+  <div class="wordmark">GO</div>
+
+  <div style="width:100px;height:90px;margin:0 auto 22px;">
+    <svg viewBox="0 0 48 48" style="width:100%;height:100%;">
+      <path fill="none" stroke="#D8B872" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" d="M9 41 V23 H6 V18 H42 V23 H39 V41 Z"/>
+      <path fill="none" stroke="#D8B872" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" d="M21 18 V41 M27 18 V41"/>
+      <path fill="none" stroke="#D8B872" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" d="M24 18c-4-7-13-5-12 0 c0.6 3 5 3.5 9 2 M24 18c4-7 13-5 12 0 c-0.6 3-5 3.5-9 2"/>
+      <circle fill="#B98D34" cx="24" cy="17.3" r="1.6"/>
+    </svg>
+  </div>
+
+  <h1 class="headline">{{ gift.occasion }}</h1>
+  <p class="subline">Organiza {{ gift.organizer_name }} · Sumate a la vaquita para {{ gift.recipient_name }}</p>
+
+  <div class="card" style="text-align:left;">
+    <div style="display:flex; justify-content:space-between; font-size:13.5px;">
+      <span>Juntado</span>
+      <span><strong>${{ "{:,}".format(total).replace(",", ".") }}</strong> de ${{ "{:,}".format(gift.goal_amount).replace(",", ".") }}</span>
+    </div>
+    <div class="progress-track"><div class="progress-fill" style="width:{{ pct }}%;"></div></div>
+    <p class="muted" style="margin:0;">{{ pct }}% de la meta</p>
+  </div>
+
+  {% if gift.status == 'open' %}
+    <a class="btn" href="{{ url_for('contribute', slug=gift.slug) }}">Aportar ahora →</a>
+    <p class="muted" style="margin-top:14px;">Menos de un minuto · Transferencia bancaria</p>
+  {% else %}
+    <p class="muted" style="margin-top:20px;">Esta colecta ya se cerró. ¡Gracias a todos los que aportaron!</p>
+  {% endif %}
+</div>
+{% endblock %}

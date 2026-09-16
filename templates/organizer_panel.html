@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block title %}Panel del organizador — GO{% endblock %}
+{% block bodyclass %}paper-page{% endblock %}
+{% block content %}
+<div class="wrap" style="max-width:560px;">
+  <div class="wordmark" style="color:var(--gold);">GO</div>
+  <h1 class="headline">{{ gift.occasion }}</h1>
+  <p class="subline">Panel del organizador · solo vos ves esta página</p>
+
+  <div class="card">
+    <div style="display:flex; justify-content:space-between; font-size:13.5px;">
+      <span>Juntado</span>
+      <span><strong>${{ "{:,}".format(total).replace(",", ".") }}</strong> de ${{ "{:,}".format(gift.goal_amount).replace(",", ".") }}</span>
+    </div>
+    <div class="progress-track"><div class="progress-fill" style="width:{{ pct }}%;"></div></div>
+    <p class="muted" style="margin:0;">{{ pct }}% de la meta · estado: {{ 'abierta' if gift.status == 'open' else 'cerrada' }}</p>
+  </div>
+
+  <div class="card">
+    <p class="muted" style="margin:0 0 6px;">Link para compartir</p>
+    <p style="font-size:13px; word-break:break-all;"><code class="ref">{{ share_url }}</code></p>
+    <a class="btn" style="margin-top:14px; background:#25D366; color:#fff;"
+       href="https://wa.me/?text={{ whatsapp_message }}" target="_blank" rel="noopener">
+      Compartir por WhatsApp
+    </a>
+  </div>
+
+  <h2 class="serif" style="font-size:17px; margin:30px 0 4px;">Aportes</h2>
+  <p class="muted" style="margin:0 0 4px;">Confirmá cada uno cuando veas la transferencia en tu cuenta, buscando la referencia.</p>
+
+  {% if contributions %}
+  <table>
+    <thead>
+      <tr><th>Quién</th><th>Monto</th><th>Referencia</th><th>Estado</th><th></th></tr>
+    </thead>
+    <tbody>
+      {% for c in contributions %}
+      <tr>
+        <td>{{ c.contributor_name }}</td>
+        <td>${{ "{:,}".format(c.amount).replace(",", ".") }}</td>
+        <td><code class="ref">{{ c.reference_code }}</code></td>
+        <td>
+          {% if c.status == 'confirmed' %}
+            <span class="status-pill status-confirmed">Confirmado</span>
+          {% else %}
+            <span class="status-pill status-pending">Pendiente</span>
+          {% endif %}
+        </td>
+        <td>
+          {% if c.status == 'pending' and gift.status == 'open' %}
+          <form method="POST" action="{{ url_for('validate_contribution', slug=gift.slug, contribution_id=c.id, token=token) }}">
+            <button class="btn btn-small" type="submit">Confirmar</button>
+          </form>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="muted">Todavía no hay aportes. Compartí el link para que empiecen a llegar.</p>
+  {% endif %}
+
+  {% if gift.status == 'open' %}
+  <form method="POST" action="{{ url_for('close_collection', slug=gift.slug, token=token) }}" onsubmit="return confirm('¿Cerrar la colecta? No se van a poder recibir más aportes, y {{ gift.recipient_name }} va a poder entrar a elegir su regalo.');">
+    <button class="btn btn-ghost" type="submit" style="margin-top:34px;">Cerrar colecta</button>
+  </form>
+  {% else %}
+  <div class="card" style="margin-top:30px;">
+    <p class="muted" style="margin:0;">Colecta cerrada. {{ gift.recipient_name }} ya puede abrir su regalo en:</p>
+    <p style="font-size:13px; word-break:break-all; margin:6px 0 0;"><code class="ref">{{ request.url_root }}regalo/{{ gift.slug }}</code></p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
