@@ -109,6 +109,15 @@ def _migrate():
     except Exception:
         pass  # esta base nunca tuvo "goal_amount" — no hay nada que migrar
 
+    # La columna vieja "goal_amount" puede seguir existiendo con NOT NULL,
+    # lo que rompe cualquier insert nuevo (que ya no le manda valor).
+    # Sacamos esa restricción — ya no se usa la columna en el código.
+    try:
+        with engine.begin() as conn:
+            conn.execute(text("ALTER TABLE gifts ALTER COLUMN goal_amount DROP NOT NULL"))
+    except Exception:
+        pass  # la columna ya no existe, o nunca tuvo esa restricción
+
 
 def _row(result):
     row = result.fetchone()
