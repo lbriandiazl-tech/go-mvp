@@ -15,8 +15,21 @@
     <label for="recipient_name">¿Para quién es el regalo?</label>
     <input type="text" id="recipient_name" name="recipient_name" placeholder="Ej: Juan" required>
 
-    <label for="occasion">¿Qué se festeja?</label>
-    <input type="text" id="occasion" name="occasion" placeholder="Ej: Cumpleaños de Juan" required>
+    <label for="occasion_select">¿Qué se festeja?</label>
+    <select id="occasion_select" style="width:100%; padding:13px 14px; font-size:15px; font-family:'Inter',sans-serif; border:1.4px solid var(--line); background:#fff; color:var(--navy); border-radius:2px;">
+      <option value="Cumpleaños">Cumpleaños</option>
+      <option value="Casamiento">Casamiento</option>
+      <option value="Baby shower">Baby shower</option>
+      <option value="Despedida de soltero/a">Despedida de soltero/a</option>
+      <option value="Aniversario">Aniversario</option>
+      <option value="Recibida">Recibida / Graduación</option>
+      <option value="Jubilación">Jubilación</option>
+      <option value="Despedida">Despedida (laboral, mudanza)</option>
+      <option value="Nacimiento">Nacimiento</option>
+      <option value="__other__">Otro</option>
+    </select>
+    <input type="text" id="occasion_custom" placeholder="Escribí qué se festeja" style="display:none; margin-top:8px; width:100%; padding:13px 14px; font-size:15px; font-family:'Inter',sans-serif; border:1.4px solid var(--line); background:#fff; color:var(--navy); border-radius:2px;">
+    <input type="hidden" id="occasion" name="occasion" value="Cumpleaños">
 
     <label for="organizer_name">Tu nombre (organizador/a)</label>
     <input type="text" id="organizer_name" name="organizer_name" placeholder="Ej: Martina Pérez" required>
@@ -35,4 +48,35 @@
     <button class="btn" type="submit">Crear regalo</button>
   </form>
 </div>
+
+<script>
+  const occasionSelect = document.getElementById('occasion_select');
+  const occasionCustom = document.getElementById('occasion_custom');
+  const occasionHidden = document.getElementById('occasion');
+
+  function syncOccasion(){
+    if (occasionSelect.value === '__other__') {
+      occasionCustom.style.display = 'block';
+      occasionHidden.value = occasionCustom.value;
+    } else {
+      occasionCustom.style.display = 'none';
+      occasionHidden.value = occasionSelect.value;
+    }
+  }
+
+  occasionSelect.addEventListener('change', () => {
+    syncOccasion();
+    if (occasionSelect.value === '__other__') occasionCustom.focus();
+  });
+  occasionCustom.addEventListener('input', syncOccasion);
+  syncOccasion();
+
+  document.querySelector('form').addEventListener('submit', (e) => {
+    if (!occasionHidden.value.trim()) {
+      e.preventDefault();
+      alert('Contanos qué se festeja.');
+      occasionCustom.focus();
+    }
+  });
+</script>
 {% endblock %}

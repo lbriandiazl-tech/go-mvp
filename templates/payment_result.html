@@ -7,7 +7,7 @@
 
   {% if result == "success" %}
     <h1 class="headline">¡Gracias por tu aporte!</h1>
-    <p class="subline">Tu pago se confirmó automáticamente. Ya quedó registrado para {{ gift.occasion }}.</p>
+    <p class="subline">Tu pago se confirmó automáticamente. Ya quedó registrado para {{ event_title(gift) }}.</p>
   {% elif result == "pending" %}
     <h1 class="headline">Tu pago está pendiente</h1>
     <p class="subline">Mercado Pago todavía lo está procesando. En cuanto se confirme, va a quedar registrado solo — no hace falta que hagas nada más.</p>

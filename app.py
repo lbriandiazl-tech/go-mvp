@@ -9,6 +9,16 @@ import resend_client
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "dev-only-change-in-production")
 
+
+def event_title(gift):
+    """Combina la ocasión con el nombre del homenajeado, sin depender
+    de que el organizador se haya acordado de escribirlo completo en
+    '¿Qué se festeja?'. 'Cumpleaños' + 'Sofía' -> 'Cumpleaños de Sofía'."""
+    return f"{gift['occasion']} de {gift['recipient_name']}"
+
+
+app.jinja_env.globals["event_title"] = event_title
+
 with app.app_context():
     db.init_db()
 
@@ -48,7 +58,7 @@ def create_gift():
         if resend_client.is_configured():
             organizer_url = url_for("organizer_panel", slug=slug, token=token, _external=True)
             try:
-                resend_client.send_organizer_link_email(organizer_email, occasion, organizer_url)
+                resend_client.send_organizer_link_email(organizer_email, f"{occasion} de {recipient_name}", organizer_url)
             except resend_client.ResendError:
                 pass  # no bloqueamos la creación del regalo si el mail falla
 
@@ -66,7 +76,7 @@ def recover_access():
             if gifts:
                 gifts_for_email = [
                     dict(
-                        occasion=g["occasion"],
+                        occasion=event_title(g),
                         organizer_url=url_for(
                             "organizer_panel", slug=g["slug"], token=g["organizer_token"], _external=True
                         ),
@@ -125,7 +135,7 @@ def contribute(slug):
             try:
                 pref_id, init_point = mercadopago_client.create_preference(
                     reference_code=ref,
-                    title=f"Aporte para {gift['occasion']} (Vaka)",
+                    title=f"Aporte para {event_title(gift)} (Vaka)",
                     amount=amount,
                     success_url=url_for("payment_result", slug=slug, result="success", _external=True),
                     failure_url=url_for("payment_result", slug=slug, result="failure", _external=True),
@@ -194,7 +204,7 @@ def organizer_panel(slug):
     total = db.confirmed_total(gift["id"])
     share_url = url_for("public_gift", slug=slug, _external=True)
     whatsapp_text = (
-        f"¡Hola! Estoy juntando un regalo para {gift['occasion']}. "
+        f"¡Hola! Estoy juntando un regalo para {event_title(gift)}. "
         f"Sumate acá: {share_url}"
     )
     whatsapp_message = quote(whatsapp_text)

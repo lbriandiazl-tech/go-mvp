@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{{ gift.occasion }} — Vaka</title>
+<title>{{ event_title(gift) }} — Vaka</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -72,7 +72,7 @@
 <div class="wordmark">Vaka</div>
 
 <div class="stage" id="step-closed">
-  <div class="greeting">{{ gift.occasion }}</div>
+  <div class="greeting">{{ event_title(gift) }}</div>
   <div class="from-line">{{ gift.recipient_name }}, tenés un regalo de parte de<br><b>{{ contributors_line }}</b></div>
   <div class="tap-box" id="tapBox">
     <svg viewBox="0 0 48 48">

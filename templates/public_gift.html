@@ -1,8 +1,8 @@
 {% extends "base.html" %}
-{% block title %}{{ gift.occasion }} — Vaka{% endblock %}
-{% block description %}Organiza {{ gift.organizer_name }} · Sumate a la vaquita para {{ gift.recipient_name }}.{% endblock %}
-{% block og_title %}{{ gift.occasion }} — Vaka{% endblock %}
-{% block og_description %}Organiza {{ gift.organizer_name }} · Sumate a la vaquita para {{ gift.recipient_name }}.{% endblock %}
+{% block title %}{{ event_title(gift) }} — Vaka{% endblock %}
+{% block description %}Organiza {{ gift.organizer_name }} · Sumate al regalo para {{ gift.recipient_name }}.{% endblock %}
+{% block og_title %}{{ event_title(gift) }} — Vaka{% endblock %}
+{% block og_description %}Organiza {{ gift.organizer_name }} · Sumate al regalo para {{ gift.recipient_name }}.{% endblock %}
 {% block bodyclass %}navy-page{% endblock %}
 {% block content %}
 <div class="wrap" style="text-align:center;">
@@ -17,8 +17,8 @@
     </svg>
   </div>
 
-  <h1 class="headline">{{ gift.occasion }}</h1>
-  <p class="subline">Organiza {{ gift.organizer_name }} · Sumate a la vaquita para {{ gift.recipient_name }}</p>
+  <h1 class="headline">{{ event_title(gift) }}</h1>
+  <p class="subline">Organiza {{ gift.organizer_name }} · Sumate al regalo</p>
 
   <div class="card" style="text-align:left;">
     <div style="display:flex; justify-content:space-between; font-size:13.5px;">

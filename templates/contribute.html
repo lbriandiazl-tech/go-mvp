@@ -5,7 +5,7 @@
 <div class="wrap">
   <div class="wordmark" style="color:var(--gold);">Vaka</div>
   <h1 class="headline">Sumá tu aporte</h1>
-  <p class="subline">Para {{ gift.occasion }}. Tu monto es privado — ni los demás participantes ni el organizador lo ven, solo que ya aportaste.</p>
+  <p class="subline">Para {{ event_title(gift) }}. Tu monto es privado — ni los demás participantes ni el organizador lo ven, solo que ya aportaste.</p>
 
   {% with messages = get_flashed_messages() %}
     {% if messages %}{% for m in messages %}<div class="flash">{{ m }}</div>{% endfor %}{% endif %}

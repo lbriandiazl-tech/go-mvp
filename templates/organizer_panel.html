@@ -4,7 +4,7 @@
 {% block content %}
 <div class="wrap" style="max-width:560px;">
   <div class="wordmark" style="color:var(--gold);">Vaka</div>
-  <h1 class="headline">{{ gift.occasion }}</h1>
+  <h1 class="headline">{{ event_title(gift) }}</h1>
   <p class="subline">Panel del organizador · solo vos ves esta página</p>
 
   <div class="card" style="border-color:var(--gold); background:rgba(185,141,52,0.08);">
@@ -91,7 +91,7 @@
 <script>
   const shareUrl = {{ share_url | tojson }};
   const slug = {{ gift.slug | tojson }};
-  const occasion = {{ gift.occasion | tojson }};
+  const occasion = {{ event_title(gift) | tojson }};
   const organizerUrl = window.location.href;
 
   function copyOrganizerLink(){
