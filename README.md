@@ -25,7 +25,7 @@ no hace falta configurar nada más.
 5. En la sección **Environment** del Web Service, agregar:
    - `DATABASE_URL` = la URL que copiaste del paso 3
    - `SECRET_KEY` = generar con `python3 -c "import secrets; print(secrets.token_hex(32))"`
-6. Deploy. Render te da una URL tipo `go-mvp.onrender.com` con HTTPS ya activado.
+6. Deploy. Render te da una URL tipo `vaka-mvp.onrender.com` con HTTPS ya activado.
 7. **Dominio propio**: comprar el dominio (Namecheap, GoDaddy, o donde prefieran)
    y en Render, Settings > Custom Domain, seguir las instrucciones para apuntar
    el DNS. Render genera el certificado HTTPS solo.

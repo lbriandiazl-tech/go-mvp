@@ -18,7 +18,7 @@ from datetime import datetime, timezone
 
 from sqlalchemy import create_engine, text
 
-DATABASE_URL = os.environ.get("DATABASE_URL", "sqlite:///go.db")
+DATABASE_URL = os.environ.get("DATABASE_URL", "sqlite:///vaka.db")
 
 # Render/Heroku entregan la URL como "postgres://...";
 # SQLAlchemy 2.x exige el prefijo "postgresql://".
@@ -100,27 +100,6 @@ def _migrate():
                 conn.execute(text(f"ALTER TABLE {table} ADD COLUMN {column} {coltype}"))
         except Exception:
             pass  # la columna ya existe — nada que hacer
-
-    # Migración específica: si esta base venía del esquema viejo con
-    # "goal_amount", copiar esos valores a "min_contribution" antes de
-    # que el campo viejo quede huérfano.
-    try:
-        with engine.begin() as conn:
-            conn.execute(text(
-                "UPDATE gifts SET min_contribution = goal_amount "
-                "WHERE min_contribution IS NULL AND goal_amount IS NOT NULL"
-            ))
-    except Exception:
-        pass  # esta base nunca tuvo "goal_amount" — no hay nada que migrar
-
-    # La columna vieja "goal_amount" puede seguir existiendo con NOT NULL,
-    # lo que rompe cualquier insert nuevo (que ya no le manda valor).
-    # Sacamos esa restricción — ya no se usa la columna en el código.
-    try:
-        with engine.begin() as conn:
-            conn.execute(text("ALTER TABLE gifts ALTER COLUMN goal_amount DROP NOT NULL"))
-    except Exception:
-        pass  # la columna ya no existe, o nunca tuvo esa restricción
 
 
 def _row(result):

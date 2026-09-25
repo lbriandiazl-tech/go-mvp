@@ -105,7 +105,7 @@
   // Recuerda este regalo en este navegador para que la home lo pueda
   // mostrar de nuevo si cerrás esta pestaña sin guardar el link.
   try {
-    const key = 'go_organized_gifts';
+    const key = 'vaka_organized_gifts';
     const saved = JSON.parse(localStorage.getItem(key) || '[]');
     const exists = saved.some(g => g.slug === slug);
     if(!exists){
