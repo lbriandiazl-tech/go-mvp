@@ -30,7 +30,7 @@
 
   {% if gift.status == 'open' %}
     <a class="btn" href="{{ url_for('contribute', slug=gift.slug) }}">Aportar ahora →</a>
-    <p class="muted" style="margin-top:14px;">Menos de un minuto · Transferencia bancaria</p>
+    <p class="muted" style="margin-top:14px;">Menos de un minuto · La plata la custodia Vaka, no el organizador</p>
   {% else %}
     <p class="muted" style="margin-top:20px;">Esta colecta ya se cerró. ¡Gracias a todos los que aportaron!</p>
   {% endif %}

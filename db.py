@@ -47,7 +47,10 @@ CREATE TABLE IF NOT EXISTS gifts (
     status TEXT NOT NULL DEFAULT 'open',
     created_at TEXT NOT NULL,
     selected_category TEXT,
-    selected_item TEXT
+    selected_item TEXT,
+    closed_at TEXT,
+    selected_at TEXT,
+    delivered_at TEXT
 );
 
 CREATE TABLE IF NOT EXISTS contributions (
@@ -90,6 +93,9 @@ def _migrate():
         ("gifts", "selected_item", "TEXT"),
         ("gifts", "bank_details", "TEXT NOT NULL DEFAULT ''"),
         ("gifts", "organizer_email", "TEXT NOT NULL DEFAULT ''"),
+        ("gifts", "closed_at", "TEXT"),
+        ("gifts", "selected_at", "TEXT"),
+        ("gifts", "delivered_at", "TEXT"),
         ("contributions", "payment_method", "TEXT NOT NULL DEFAULT 'transfer'"),
         ("contributions", "mp_preference_id", "TEXT"),
         ("contributions", "mp_payment_id", "TEXT"),
@@ -138,7 +144,10 @@ def _now():
 
 # ---------- regalos ----------
 
-def create_gift(recipient_name, occasion, organizer_name, organizer_email, min_contribution, bank_details, currency="UYU"):
+def create_gift(recipient_name, occasion, organizer_name, organizer_email, min_contribution, bank_details="", currency="UYU"):
+    # bank_details queda en la tabla solo por compatibilidad con regalos
+    # viejos: con el modelo de custodia la cuenta es siempre la de Vaka
+    # (variable de entorno VAKA_BANK_DETAILS), no la del organizador.
     slug = new_slug(recipient_name)
     token = new_token()
     with engine.begin() as conn:
@@ -174,7 +183,10 @@ def get_gift_by_token(slug, token):
 
 def close_gift(gift_id):
     with engine.begin() as conn:
-        conn.execute(text("UPDATE gifts SET status = 'closed' WHERE id = :id"), dict(id=gift_id))
+        conn.execute(
+            text("UPDATE gifts SET status = 'closed', closed_at = :now WHERE id = :id AND status = 'open'"),
+            dict(now=_now(), id=gift_id),
+        )
 
 
 # ---------- aportes ----------
@@ -226,7 +238,8 @@ def confirmed_contributors(gift_id):
 def confirm_contribution(contribution_id):
     with engine.begin() as conn:
         conn.execute(
-            text("UPDATE contributions SET status = 'confirmed', confirmed_at = :now WHERE id = :id"),
+            text("""UPDATE contributions SET status = 'confirmed', confirmed_at = :now
+                   WHERE id = :id AND status != 'confirmed'"""),
             dict(now=_now(), id=contribution_id),
         )
 
@@ -272,8 +285,9 @@ def confirm_contribution_by_mp(reference_code, mp_payment_id):
 def set_selected_item(gift_id, category, item_title):
     with engine.begin() as conn:
         conn.execute(
-            text("UPDATE gifts SET selected_category = :cat, selected_item = :item WHERE id = :id"),
-            dict(cat=category, item=item_title, id=gift_id),
+            text("""UPDATE gifts SET selected_category = :cat, selected_item = :item,
+                   selected_at = :now WHERE id = :id"""),
+            dict(cat=category, item=item_title, now=_now(), id=gift_id),
         )
 
 
@@ -298,3 +312,70 @@ def get_gifts_by_organizer_email(email):
             dict(email=email.strip().lower()),
         )
         return _rows(result)
+
+
+# ---------- panel de Vaka (admin) ----------
+
+def list_pending_transfers():
+    """Transferencias que esperan que Vaka las vea en su cuenta y las
+    confirme. Incluye regalos ya cerrados: si la plata llegó tarde,
+    igual entró a la cuenta de Vaka y hay que registrarla."""
+    with engine.connect() as conn:
+        result = conn.execute(text("""
+            SELECT c.id, c.contributor_name, c.amount, c.reference_code, c.created_at,
+                   g.slug, g.recipient_name, g.occasion, g.status AS gift_status
+            FROM contributions c JOIN gifts g ON g.id = c.gift_id
+            WHERE c.status = 'pending' AND c.payment_method = 'transfer'
+            ORDER BY c.created_at ASC"""))
+        return _rows(result)
+
+
+def list_gifts_with_totals():
+    with engine.connect() as conn:
+        result = conn.execute(text("""
+            SELECT g.*,
+                   COALESCE(SUM(CASE WHEN c.status = 'confirmed' THEN c.amount END), 0) AS total,
+                   COUNT(CASE WHEN c.status = 'confirmed' THEN 1 END) AS confirmed_count,
+                   COUNT(CASE WHEN c.status = 'pending' THEN 1 END) AS pending_count
+            FROM gifts g LEFT JOIN contributions c ON c.gift_id = g.id
+            GROUP BY g.id
+            ORDER BY g.created_at DESC"""))
+        return _rows(result)
+
+
+def mark_delivered(gift_id):
+    with engine.begin() as conn:
+        conn.execute(
+            text("""UPDATE gifts SET delivered_at = :now
+                   WHERE id = :id AND status = 'closed' AND delivered_at IS NULL"""),
+            dict(now=_now(), id=gift_id),
+        )
+
+
+def admin_stats():
+    """Los números del objetivo actual: 10 vaquitas reales de punta a punta."""
+    gifts = list_gifts_with_totals()
+    delivered = [g for g in gifts if g["delivered_at"]]
+    hours = []
+    for g in delivered:
+        if g["closed_at"]:
+            try:
+                delta = datetime.fromisoformat(g["delivered_at"]) - datetime.fromisoformat(g["closed_at"])
+                hours.append(delta.total_seconds() / 3600)
+            except ValueError:
+                pass
+    with engine.connect() as conn:
+        by_method = _rows(conn.execute(text("""
+            SELECT payment_method, COUNT(*) AS n FROM contributions
+            WHERE status = 'confirmed' GROUP BY payment_method""")))
+    methods = {r["payment_method"]: r["n"] for r in by_method}
+    return dict(
+        created=len(gifts),
+        open=sum(1 for g in gifts if g["status"] == "open"),
+        closed=sum(1 for g in gifts if g["status"] == "closed"),
+        delivered=len(delivered),
+        collected=sum(g["total"] for g in gifts),
+        avg_hours_to_deliver=(sum(hours) / len(hours)) if hours else None,
+        mp_count=methods.get("mercadopago", 0),
+        transfer_count=methods.get("transfer", 0),
+    )

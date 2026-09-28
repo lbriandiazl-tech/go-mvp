@@ -9,7 +9,7 @@
 
   <div class="card" style="border-color:var(--gold); background:rgba(185,141,52,0.08);">
     <p style="margin:0 0 8px; font-weight:700; color:var(--navy); font-size:13.5px;">⚠️ Guardá este link</p>
-    <p class="muted" style="margin:0 0 12px;">Es la única forma de volver a administrar este regalo — no hay usuario ni contraseña. Si cerrás esta página sin guardarlo, no vas a poder confirmar aportes ni cerrar la colecta.</p>
+    <p class="muted" style="margin:0 0 12px;">Es la única forma de volver a administrar este regalo — no hay usuario ni contraseña. Si cerrás esta página sin guardarlo, no vas a poder seguir los aportes ni cerrar la colecta.</p>
     <button type="button" onclick="copyOrganizerLink()" class="btn" style="margin-top:0;">Copiar este link</button>
   </div>
 
@@ -31,37 +31,28 @@
   </div>
 
   <div class="card">
-    <p class="muted" style="margin:0 0 6px;">Datos bancarios que ven quienes aportan</p>
-    <p style="font-size:13px; white-space:pre-line; line-height:1.5; margin:0;">{{ gift.bank_details }}</p>
+    <p style="margin:0 0 4px; font-weight:600; font-size:13.5px;">La plata la custodia Vaka</p>
+    <p class="muted" style="margin:0;">Los aportes entran a cuentas de Vaka, no a la tuya. Nosotros confirmamos las transferencias y, cuando {{ gift.recipient_name }} elija su regalo, nos encargamos de conseguirlo y entregarlo.</p>
   </div>
 
-  <h2 class="serif" style="font-size:17px; margin:30px 0 4px;">Aportes</h2>
-  <p class="muted" style="margin:0 0 4px;">Los pagos con Mercado Pago se confirman solos. Los de transferencia los confirmás vos cuando veas el dinero en tu cuenta, buscando la referencia.</p>
+  <h2 class="serif" style="font-size:17px; margin:30px 0 4px;">Quiénes se sumaron</h2>
+  <p class="muted" style="margin:0 0 4px;">Por privacidad no ves cuánto puso cada uno, solo el total. Mercado Pago se confirma al instante; las transferencias las confirma Vaka en hasta 24 h hábiles.</p>
 
   {% if contributions %}
   <table>
     <thead>
-      <tr><th>Quién</th><th>Monto</th><th>Medio</th><th>Referencia</th><th>Estado</th><th></th></tr>
+      <tr><th>Quién</th><th>Medio</th><th>Estado</th></tr>
     </thead>
     <tbody>
       {% for c in contributions %}
       <tr>
         <td>{{ c.contributor_name }}</td>
-        <td>${{ "{:,}".format(c.amount).replace(",", ".") }}</td>
         <td>{{ "Mercado Pago" if c.payment_method == "mercadopago" else "Transferencia" }}</td>
-        <td><code class="ref">{{ c.reference_code }}</code></td>
         <td>
           {% if c.status == 'confirmed' %}
             <span class="status-pill status-confirmed">Confirmado</span>
           {% else %}
-            <span class="status-pill status-pending">Pendiente</span>
-          {% endif %}
-        </td>
-        <td>
-          {% if c.status == 'pending' and gift.status == 'open' and c.payment_method != 'mercadopago' %}
-          <form method="POST" action="{{ url_for('validate_contribution', slug=gift.slug, contribution_id=c.id, token=token) }}">
-            <button class="btn btn-small" type="submit">Confirmar</button>
-          </form>
+            <span class="status-pill status-pending">Esperando pago</span>
           {% endif %}
         </td>
       </tr>
@@ -69,7 +60,7 @@
     </tbody>
   </table>
   {% else %}
-  <p class="muted">Todavía no hay aportes. Compartí el link para que empiecen a llegar.</p>
+  <p class="muted">Todavía no se sumó nadie. Compartí el link para que empiecen a llegar.</p>
   {% endif %}
 
   {% if gift.status == 'open' %}

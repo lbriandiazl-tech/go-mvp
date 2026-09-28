@@ -41,6 +41,26 @@ no hace falta configurar nada más.
 5. `/regalo/<slug>` — experiencia del destinatario: abre la caja (interactivo,
    no automático) y elige una categoría del catálogo
 
+## Custodia: la plata entra a Vaka, no al organizador
+
+Todos los aportes entran a cuentas de Vaka. El organizador no carga
+datos bancarios ni confirma pagos: solo comparte el link, ve quién se
+sumó y el total (nunca el monto de cada persona), y cierra la colecta.
+
+Variables en Render > Environment:
+
+- `VAKA_BANK_DETAILS` — datos de la cuenta bancaria de Vaka que ve quien
+  elige transferir (banco, tipo de cuenta, número, titular). Admite
+  varias líneas. Sin esta variable, la opción de transferencia no aparece.
+- `ADMIN_TOKEN` — clave larga y secreta para entrar a
+  `/admin?token=<ADMIN_TOKEN>`. Sin esta variable, `/admin` da 404.
+
+En `/admin` Vaka:
+1. Confirma transferencias (buscando la referencia `VK-XXXXXX` en el banco)
+2. Ve las colectas cerradas con la experiencia elegida y las marca como entregadas
+3. Sigue el objetivo de 10 vaquitas: creadas, juntado, MP vs transferencia,
+   horas promedio entre cierre y entrega
+
 ## Mercado Pago (pago automático)
 
 Si configurás `MP_ACCESS_TOKEN` (Render > Environment), el formulario de

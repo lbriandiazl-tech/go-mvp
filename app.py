@@ -1,4 +1,6 @@
+import hmac
 import os
+from datetime import datetime
 from urllib.parse import quote
 from flask import Flask, render_template, request, redirect, url_for, abort, flash
 import db
@@ -18,6 +20,47 @@ def event_title(gift):
 
 
 app.jinja_env.globals["event_title"] = event_title
+
+
+# ---------------------------------------------------------------
+# Custodia: toda la plata entra a cuentas de Vaka, no del organizador.
+#   VAKA_BANK_DETAILS -> datos de la cuenta bancaria de Vaka (se muestran
+#                        a quien elige transferencia). Sin esta variable,
+#                        la opción de transferencia no aparece.
+#   ADMIN_TOKEN       -> clave del panel /admin, donde Vaka confirma
+#                        transferencias y marca experiencias entregadas.
+#                        Sin esta variable, /admin no existe (404).
+# ---------------------------------------------------------------
+
+def vaka_bank_details():
+    return os.environ.get("VAKA_BANK_DETAILS", "").strip()
+
+
+def transfer_enabled():
+    return bool(vaka_bank_details())
+
+
+def _is_admin(token):
+    expected = os.environ.get("ADMIN_TOKEN", "")
+    return bool(expected) and hmac.compare_digest(token or "", expected)
+
+
+def fmt_money(n):
+    return "{:,}".format(int(n or 0)).replace(",", ".")
+
+
+def fmt_date(iso):
+    if not iso:
+        return ""
+    try:
+        return datetime.fromisoformat(iso).strftime("%d/%m %H:%M")
+    except ValueError:
+        return iso
+
+
+app.jinja_env.globals["transfer_enabled"] = transfer_enabled
+app.jinja_env.filters["money"] = fmt_money
+app.jinja_env.filters["fdate"] = fmt_date
 
 with app.app_context():
     db.init_db()
@@ -39,20 +82,19 @@ def create_gift():
         occasion = request.form["occasion"].strip()
         organizer_name = request.form["organizer_name"].strip()
         organizer_email = request.form.get("organizer_email", "").strip().lower()
-        bank_details = request.form.get("bank_details", "").strip()
         try:
             min_contribution = int(request.form["min_contribution"])
         except (ValueError, KeyError):
             min_contribution = 0
 
         if not (recipient_name and occasion and organizer_name and organizer_email
-                and min_contribution > 0 and bank_details):
-            flash("Completá todos los campos, incluidos tu mail y los datos bancarios.")
+                and min_contribution > 0):
+            flash("Completá todos los campos, incluido tu mail.")
             return render_template("create_gift.html")
 
         slug, token = db.create_gift(
             recipient_name, occasion, organizer_name, organizer_email,
-            min_contribution, bank_details,
+            min_contribution,
         )
 
         if resend_client.is_configured():
@@ -116,6 +158,11 @@ def contribute(slug):
         return render_template("closed.html", gift=gift)
 
     suggested = db.suggested_amounts(gift["min_contribution"])
+    mp_enabled = mercadopago_client.is_configured()
+
+    def form(**extra):
+        return render_template("contribute.html", gift=gift, mp_enabled=mp_enabled,
+                               suggested=suggested, **extra)
 
     if request.method == "POST":
         contributor_name = request.form["contributor_name"].strip()
@@ -127,9 +174,9 @@ def contribute(slug):
 
         if not (contributor_name and amount > 0):
             flash("Ingresá tu nombre y un monto válido.")
-            return render_template("contribute.html", gift=gift, mp_enabled=mercadopago_client.is_configured(), suggested=suggested)
+            return form()
 
-        if payment_method == "mercadopago" and mercadopago_client.is_configured():
+        if payment_method == "mercadopago" and mp_enabled:
             ref = db.create_contribution(gift["id"], contributor_name, amount, payment_method="mercadopago")
             contribution = db.get_contribution_by_reference(ref)
             try:
@@ -145,13 +192,21 @@ def contribute(slug):
                 db.set_mp_preference(contribution["id"], pref_id)
                 return redirect(init_point)
             except mercadopago_client.MercadoPagoError as e:
-                flash(f"No se pudo iniciar el pago con Mercado Pago ({e}). Probá con transferencia bancaria.")
-                return render_template("contribute.html", gift=gift, mp_enabled=mercadopago_client.is_configured(), suggested=suggested)
+                if transfer_enabled():
+                    flash(f"No se pudo iniciar el pago con Mercado Pago ({e}). Probá con transferencia bancaria.")
+                else:
+                    flash(f"No se pudo iniciar el pago con Mercado Pago ({e}). Probá de nuevo en unos minutos.")
+                return form()
+
+        if not transfer_enabled():
+            flash("Por ahora no hay un medio de pago disponible. Probá de nuevo más tarde.")
+            return form()
 
         ref = db.create_contribution(gift["id"], contributor_name, amount, payment_method="transfer")
-        return render_template("contribute_instructions.html", gift=gift, amount=amount, ref=ref)
+        return render_template("contribute_instructions.html", gift=gift, amount=amount, ref=ref,
+                               bank_details=vaka_bank_details())
 
-    return render_template("contribute.html", gift=gift, mp_enabled=mercadopago_client.is_configured(), suggested=suggested)
+    return form()
 
 
 @app.route("/g/<slug>/pago/<result>", methods=["GET"])
@@ -191,7 +246,7 @@ def mercadopago_webhook():
 
 
 # ---------------------------------------------------------------
-# Panel del organizador — validación manual, ver estado, cerrar
+# Panel del organizador — ver estado (sin montos individuales), cerrar
 # ---------------------------------------------------------------
 
 @app.route("/organizador/<slug>", methods=["GET"])
@@ -200,7 +255,13 @@ def organizer_panel(slug):
     gift = db.get_gift_by_token(slug, token)
     if not gift:
         abort(404)
-    contributions = db.list_contributions(gift["id"])
+    # Solo nombre, medio y estado: el monto individual NO sale del
+    # servidor hacia el organizador (lo prometemos en la landing).
+    contributions = [
+        dict(contributor_name=c["contributor_name"], payment_method=c["payment_method"],
+             status=c["status"])
+        for c in db.list_contributions(gift["id"])
+    ]
     total = db.confirmed_total(gift["id"])
     share_url = url_for("public_gift", slug=slug, _external=True)
     whatsapp_text = (
@@ -223,19 +284,6 @@ def organizer_panel(slug):
     )
 
 
-@app.route("/organizador/<slug>/validar/<int:contribution_id>", methods=["POST"])
-def validate_contribution(slug, contribution_id):
-    token = request.args.get("token", "")
-    gift = db.get_gift_by_token(slug, token)
-    if not gift:
-        abort(404)
-    contribution = db.get_contribution(contribution_id)
-    if not contribution or contribution["gift_id"] != gift["id"]:
-        abort(404)
-    db.confirm_contribution(contribution_id)
-    return redirect(url_for("organizer_panel", slug=slug, token=token))
-
-
 @app.route("/organizador/<slug>/cerrar", methods=["POST"])
 def close_collection(slug):
     token = request.args.get("token", "")
@@ -244,6 +292,51 @@ def close_collection(slug):
         abort(404)
     db.close_gift(gift["id"])
     return redirect(url_for("organizer_panel", slug=slug, token=token))
+
+
+# ---------------------------------------------------------------
+# Panel de Vaka (admin) — confirmar transferencias, entregar regalos
+# ---------------------------------------------------------------
+
+@app.route("/admin", methods=["GET"])
+def admin_panel():
+    token = request.args.get("token", "")
+    if not _is_admin(token):
+        abort(404)
+    gifts = db.list_gifts_with_totals()
+    return render_template(
+        "admin.html",
+        token=token,
+        pending=db.list_pending_transfers(),
+        to_deliver=[g for g in gifts if g["status"] == "closed" and not g["delivered_at"]],
+        gifts=gifts,
+        stats=db.admin_stats(),
+        transfer_ok=transfer_enabled(),
+        mp_ok=mercadopago_client.is_configured(),
+    )
+
+
+@app.route("/admin/confirmar/<int:contribution_id>", methods=["POST"])
+def admin_confirm_contribution(contribution_id):
+    token = request.args.get("token", "")
+    if not _is_admin(token):
+        abort(404)
+    contribution = db.get_contribution(contribution_id)
+    if not contribution:
+        abort(404)
+    db.confirm_contribution(contribution_id)
+    flash(f"Confirmado: {contribution['reference_code']} · ${fmt_money(contribution['amount'])}")
+    return redirect(url_for("admin_panel", token=token))
+
+
+@app.route("/admin/entregado/<int:gift_id>", methods=["POST"])
+def admin_mark_delivered(gift_id):
+    token = request.args.get("token", "")
+    if not _is_admin(token):
+        abort(404)
+    db.mark_delivered(gift_id)
+    flash("Regalo marcado como entregado.")
+    return redirect(url_for("admin_panel", token=token))
 
 
 # ---------------------------------------------------------------

@@ -41,9 +41,10 @@
     <label for="min_contribution">Aporte mínimo sugerido (UYU)</label>
     <input type="number" id="min_contribution" name="min_contribution" placeholder="Ej: 400" min="1" required>
 
-    <label for="bank_details">Datos para transferir (banco, tipo de cuenta, número, titular)</label>
-    <textarea id="bank_details" name="bank_details" rows="4" placeholder="Ej: BROU, Caja de Ahorros en pesos, cuenta 001234567, titular Martina Pérez" required style="width:100%; padding:13px 14px; font-size:15px; font-family:'Inter',sans-serif; border:1.4px solid var(--line); background:#fff; color:var(--navy); border-radius:2px; resize:vertical;"></textarea>
-    <p class="muted" style="margin:6px 0 0;">Esto lo va a ver cada persona que elija aportar por transferencia — poné todo lo necesario para que no tenga dudas de a dónde mandar la plata.</p>
+    <div class="card" style="margin-top:22px; padding:16px 18px;">
+      <p style="margin:0 0 4px; font-weight:600; font-size:13.5px;">No tenés que poner tu cuenta ni manejar plata</p>
+      <p class="muted" style="margin:0;">Los aportes entran a una cuenta de Vaka, quedan resguardados ahí y Vaka se encarga de conseguir y entregar la experiencia que elija el homenajeado. Vos solo compartís el link y cerrás la colecta.</p>
+    </div>
 
     <button class="btn" type="submit">Crear regalo</button>
   </form>
