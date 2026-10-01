@@ -729,3 +729,6 @@
   .close-box.done .btn.wa{width:auto}
   select{width:100%;padding:14px 16px;border:1.5px solid var(--line);border-radius:14px;background:#fff;font:16px var(--sans);color:var(--ink)}
   #occasion_custom{width:100%;padding:14px 16px;border:1.5px solid var(--line);border-radius:14px;background:#fff;font:16px var(--sans)}
+
+  .logo img{display:block;height:34px;width:auto}
+  footer .logo img{height:38px}

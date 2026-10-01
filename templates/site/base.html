@@ -13,7 +13,9 @@
 <meta property="og:site_name" content="Vaka">
 <meta property="og:locale" content="es_UY">
 <meta name="theme-color" content="#101B26">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Crect width='48' height='48' rx='12' fill='%23101B26'/%3E%3Cg fill='none' stroke='%23D8B872' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 38V24H9.5v-4h29v4H36v14z'/%3E%3Cpath d='M21.5 20v18M26.5 20v18'/%3E%3Cpath d='M24 20c-3.5-6-11-4.5-10 0 .5 2.5 4 3 7.5 1.7M24 20c3.5-6 11-4.5 10 0-.5 2.5-4 3-7.5 1.7'/%3E%3C/g%3E%3C/svg%3E">
+<link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='brand/vaka-icono-app.svg') }}">
+<link rel="apple-touch-icon" href="{{ url_for('static', filename='brand/vaka-icono-app.png') }}">
+<meta property="og:image" content="{{ SITE_URL }}{{ url_for('static', filename='brand/vaka-icono-app.png') }}">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -25,7 +27,7 @@
 
 <header class="nav" id="nav">
   <div class="wrap">
-    <a class="logo" href="{{ url_for('home') }}" aria-label="Vaka, inicio"><b>Vaka</b><svg><use href="#box"/></svg></a>
+    <a class="logo" href="{{ url_for('home') }}" aria-label="Vaka, inicio"><img src="{{ url_for('static', filename='brand/vaka-logo.svg') }}" alt="Vaka" width="112" height="34"></a>
     <nav aria-label="Principal">
       <ul class="menu">
         <li class="has-dd">
@@ -71,7 +73,7 @@
 
 <div class="mnav" id="mnav" aria-label="Menú">
   <div class="top">
-    <a class="logo" href="{{ url_for('home') }}"><b>Vaka</b><svg><use href="#box"/></svg></a>
+    <a class="logo" href="{{ url_for('home') }}"><img src="{{ url_for('static', filename='brand/vaka-logo.svg') }}" alt="Vaka" width="112" height="34"></a>
     <button class="burger" type="button" aria-label="Cerrar menú" id="mclose"><svg><use href="#i-close"/></svg></button>
   </div>
   <details><summary>Cómo funciona</summary><div class="sub">
@@ -93,7 +95,7 @@
   <div class="wrap">
     <div class="cols">
       <div>
-        <a class="logo" href="{{ url_for('home') }}" aria-label="Vaka"><b>Vaka</b><svg><use href="#box"/></svg></a>
+        <a class="logo" href="{{ url_for('home') }}" aria-label="Vaka"><img src="{{ url_for('static', filename='brand/vaka-logo-fondo-oscuro.svg') }}" alt="Vaka" width="112" height="34"></a>
         <p class="tl">Regalos que se arman entre todos.</p>
         <a href="mailto:{{ CONTACT_EMAIL }}">{{ CONTACT_EMAIL }}</a>
       </div>
