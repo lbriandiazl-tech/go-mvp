@@ -30,7 +30,7 @@ def is_configured():
     return bool(RESEND_API_KEY)
 
 
-def send_email(to, subject, html):
+def send_email(to, subject, html, reply_to=None):
     if not RESEND_API_KEY:
         raise ResendError("Falta configurar RESEND_API_KEY en las variables de entorno.")
 
@@ -46,6 +46,7 @@ def send_email(to, subject, html):
                 "to": [to] if isinstance(to, str) else to,
                 "subject": subject,
                 "html": html,
+                **({"reply_to": reply_to} if reply_to else {}),
             },
             timeout=10,
         )

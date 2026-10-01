@@ -1,0 +1,39 @@
+{% extends 'site/base.html' %}
+{% import 'site/_macros.html' as m with context %}
+{% block title %}Ocasiones — Vaka{% endblock %}
+{% block description %}Regalos en grupo para cumpleaños, casamientos, nacimientos, despedidas, jubilaciones y más.{% endblock %}
+{% block content %}
+
+<section class="phero">
+  <div class="wrap">
+    <span class="kicker">Ocasiones</span>
+    <h1>Para cada momento <em>que vale la pena.</em></h1>
+    <p class="lead">Familia, amigos o equipo de trabajo: cuando varias personas quieren regalar algo juntas, Vaka lo hace simple.</p>
+    <nav class="occ-tabs" aria-label="Categorías">
+      <a href="#celebraciones">Celebraciones</a><a href="#familia">Familia</a><a href="#trabajo">Trabajo</a>
+    </nav>
+  </div>
+</section>
+
+{% for group in ['Celebraciones', 'Familia', 'Trabajo'] %}
+<section class="occ-group{% if loop.last %} last{% endif %}" id="{{ group|lower }}">
+  <div class="wrap">
+    <div class="sec-head"><div><span class="kicker">{{ group }}</span></div></div>
+    <div class="occ-list">
+      {% for o in m.OCCASIONS if o[4] == group %}
+      <article class="occ-row reveal" id="{{ o[0] }}">
+        <div class="occ-cover {{ o[3] }}" aria-hidden="true"><svg><use href="#{{ o[2] }}"/></svg></div>
+        <div class="occ-txt">
+          <h2>{{ o[1] }}</h2>
+          <p>{{ o[5] }}</p>
+          <a class="btn btn-line" href="{{ url_for('create_gift', ocasion=o[6]) }}">Armar un regalo <svg><use href="#arrow"/></svg></a>
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endfor %}
+
+{{ m.final_cta('¿No encontrás <em>tu ocasión?</em>', 'Vaka sirve para cualquier regalo en grupo. Al crearlo, elegí "Otro" y escribí qué se celebra.') }}
+{% endblock %}

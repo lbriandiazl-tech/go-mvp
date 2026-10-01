@@ -1,0 +1,47 @@
+{% extends 'site/base.html' %}
+{% import 'site/_macros.html' as m with context %}
+{% block title %}Nuestra historia — Vaka{% endblock %}
+{% block description %}Vaka nació en Montevideo para que regalar en grupo sea simple, privado y especial.{% endblock %}
+{% block content %}
+
+<section class="phero">
+  <div class="wrap">
+    <span class="kicker">Nuestra historia</span>
+    <h1>Creemos que los mejores regalos <em>se hacen entre varios.</em></h1>
+    <p class="lead">Vaka nació en Montevideo con una idea simple: que regalar en grupo sea tan fácil como compartir un link, y que el momento de recibirlo sea tan especial como el gesto.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap about-grid">
+    <div class="prose reveal">
+      <h2>Por qué existe Vaka</h2>
+      <p>Todos participamos alguna vez de un regalo en grupo. Alguien propone la idea, otro se ofrece a juntar el dinero, se adelantan pagos, se hacen cuentas y, al final, el regalo se elige a último momento.</p>
+      <p>Vaka reúne todo ese proceso en un solo lugar. Quien organiza crea el regalo en un minuto, cada persona aporta de forma privada desde su celular y quien recibe abre su regalo, lee los mensajes y elige qué quiere.</p>
+      <h2>Cómo trabajamos</h2>
+      <p>Diseñamos cada detalle pensando en las tres personas que forman parte de un regalo: quien organiza, quien aporta y quien recibe. Trabajamos con plataformas de pago reconocidas y con comercios y marcas que comparten nuestra forma de ver los regalos.</p>
+    </div>
+    <div class="values">
+      <div class="card reveal"><div class="ico"><svg><use href="#lock"/></svg></div><h3>Privacidad</h3><p>Cada aporte es personal. Nadie tiene que compararse ni dar explicaciones.</p></div>
+      <div class="card reveal"><div class="ico"><svg><use href="#i-heart"/></svg></div><h3>Libertad de elección</h3><p>El mejor regalo es el que quien recibe elige.</p></div>
+      <div class="card reveal"><div class="ico"><svg><use href="#i-shield"/></svg></div><h3>Confianza</h3><p>Cada aporte se procesa de forma segura y se destina al regalo.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="how">
+  <div class="wrap demo-grid">
+    <div>
+      <span class="kicker">Contacto</span>
+      <h2 style="margin-top:18px">Hablemos.</h2>
+      <p class="lead" style="margin-top:20px">Prensa, alianzas, comercios o cualquier consulta: escribinos a <a href="mailto:{{ CONTACT_EMAIL }}" style="color:var(--gold-ink);font-weight:600">{{ CONTACT_EMAIL }}</a>.</p>
+    </div>
+    <div class="about-links">
+      <a class="pv a" href="{{ url_for('page_business') }}"><h3>Empresas</h3><span class="go">Vaka para equipos <svg><use href="#arrow"/></svg></span></a>
+      <a class="pv b" href="{{ url_for('page_merchants') }}"><h3>Comercios</h3><span class="go">Sumá tu marca <svg><use href="#arrow"/></svg></span></a>
+    </div>
+  </div>
+</section>
+
+{{ m.final_cta() }}
+{% endblock %}

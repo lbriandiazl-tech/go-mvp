@@ -1,0 +1,229 @@
+{% extends 'site/base.html' %}
+{% import 'site/_macros.html' as m with context %}
+{% block content %}
+
+<!-- HERO -->
+<section class="hero">
+  <div class="wrap">
+    <div>
+      <span class="kicker">Regalos en grupo</span>
+      <h1>Regalos que se arman <em>entre todos.</em></h1>
+      <p class="lead">Compartís un link, cada persona aporta de forma privada y quien recibe elige su regalo. Simple para quien organiza, cómodo para quien aporta.</p>
+      <div class="ctas">
+        <a class="btn btn-gold" href="{{ url_for('create_gift') }}">Armar un regalo <svg><use href="#arrow"/></svg></a>
+        <a class="btn btn-line" href="{{ url_for('demo_group') }}"><svg><use href="#i-play"/></svg> Ver una demostración</a>
+      </div>
+      <div class="meta">
+        <span><svg><use href="#lock"/></svg>Aportes privados</span>
+        <span><svg><use href="#box"/></svg>Elige quien recibe</span>
+        <span><svg viewBox="0 0 16 16"><rect x="4.5" y="1.5" width="7" height="13" rx="1.8" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>Sin descargar nada</span>
+      </div>
+    </div>
+
+    <div class="scene" aria-hidden="true">
+      <div class="giftcard">
+        <div class="gc-in">
+          <div class="gc-top">VAKA</div>
+          <div class="ring">
+            <svg viewBox="0 0 150 150"><circle cx="75" cy="75" r="64" fill="none" stroke="rgba(244,239,228,.12)" stroke-width="10"/><circle id="ringArc" cx="75" cy="75" r="64" fill="none" stroke="#D8B872" stroke-width="10" stroke-linecap="round" stroke-dasharray="402" stroke-dashoffset="113"/></svg>
+            <div class="val"><div><strong id="amt">$ 18.400</strong><small>juntados</small></div></div>
+          </div>
+          <h3>Cumpleaños de Sofía</h3>
+          <div class="who">12 personas se sumaron</div>
+          <div class="gc-btn">Sumarme al regalo</div>
+        </div>
+      </div>
+      <div class="note n1"><div class="av" style="background:#D8B872">LC</div><div><b>Lucas se sumó</b><span>"¡Feliz cumple, Sofi!"</span></div></div>
+      <div class="note n2"><div class="av" style="background:#C9D6C5">AP</div><div><b>Ana se sumó</b><span>"Que lo disfrutes mucho"</span></div></div>
+      <div class="note n3"><div class="av" style="background:#E3C9A8">JM</div><div><b>Juan se sumó</b><span>Su aporte es privado</span></div></div>
+      <div class="tag">CIERRA EL VIERNES</div>
+    </div>
+  </div>
+</section>
+
+<!-- TRUST -->
+<div class="wrap trust-wrap">
+  <div class="trust">
+    <div><svg><use href="#i-shield"/></svg><div><b>Pagos protegidos</b><span>Procesados por plataformas de pago reconocidas.</span></div></div>
+    <div><svg><use href="#lock"/></svg><div><b>Aportes privados</b><span>Se ve el total, nunca el monto de cada uno.</span></div></div>
+    <div><svg viewBox="0 0 16 16"><rect x="4.5" y="1.5" width="7" height="13" rx="1.8" fill="none" stroke="currentColor" stroke-width="1.3"/></svg><div><b>Sin descargas</b><span>Funciona desde el navegador, en cualquier dispositivo.</span></div></div>
+    <div><svg><use href="#i-chat"/></svg><div><b>Atención personalizada</b><span>Un equipo en Montevideo para ayudarte.</span></div></div>
+  </div>
+</div>
+
+<!-- MARQUEE -->
+<div class="marquee" aria-label="Ocasiones">
+  <div class="track">
+    {% for loop_i in range(2) %}
+    {% for o in m.OCCASIONS %}<span{% if loop_i %} aria-hidden="true"{% endif %}>{{ o[1] }}</span><svg><use href="#box"/></svg>{% endfor %}
+    {% endfor %}
+  </div>
+</div>
+
+<!-- WHY -->
+<section class="why">
+  <div class="wrap">
+    <div class="reveal">
+      <span class="kicker">Por qué Vaka</span>
+      <h2>Regalar en grupo, <em>sin complicaciones.</em></h2>
+      <p class="lead">Vaka reúne los aportes, cuida la privacidad de cada persona y deja la elección en manos de quien recibe.</p>
+      <a class="btn btn-line" style="margin-top:32px" href="{{ url_for('page_how') }}">Conocé cómo funciona <svg><use href="#arrow"/></svg></a>
+    </div>
+    <div class="points">
+      <div class="point reveal">
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="#D8B872" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v5c0 5.5-3.5 8.5-8 10-4.5-1.5-8-4.5-8-10V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg></div>
+        <h3>Aportes privados</h3><p>Cada persona aporta lo que desea. Se ve el total reunido, no el monto de cada aporte.</p>
+      </div>
+      <div class="point reveal">
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="#D8B872" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
+        <h3>Nadie adelanta dinero</h3><p>Cada persona aporta su parte directamente. Nadie tiene que comprar antes ni cobrar después.</p>
+      </div>
+      <div class="point reveal">
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="#D8B872" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16M14 6l6 6-6 6"/></svg></div>
+        <h3>Un solo link</h3><p>Se comparte por mensaje o mail y funciona desde el navegador, sin aplicaciones ni registros.</p>
+      </div>
+      <div class="point reveal">
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="#D8B872" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-4.4-9-9.2C1.6 8.3 4 5 7.3 5c2 0 3.5 1.1 4.7 2.6C13.2 6.1 14.7 5 16.7 5 20 5 22.4 8.3 21 11.8 19 16.6 12 21 12 21z"/></svg></div>
+        <h3>Elige quien recibe</h3><p>Quien recibe elige lo que realmente quiere. Un regalo que siempre acierta.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW -->
+<section class="how" id="como-funciona">
+  <div class="wrap">
+    <div class="how-head">
+      <div><span class="kicker">Cómo funciona</span><h2>De la idea al regalo, en <em>cuatro pasos.</em></h2></div>
+      <a class="btn btn-line" href="{{ url_for('page_how') }}">Ver en detalle <svg><use href="#arrow"/></svg></a>
+    </div>
+    {% include 'site/_steps.html' %}
+  </div>
+</section>
+
+<!-- PREVIEWS -->
+<section class="pv-sec">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div><span class="kicker">Probalo</span><h2>Mirá Vaka <em>desde adentro.</em></h2></div>
+      <p class="lead">Dos demostraciones interactivas, sin crear nada ni pagar.</p>
+    </div>
+    <div class="previews">
+      <a class="pv a reveal" href="{{ url_for('demo_group') }}">
+        <div class="pv-art" aria-hidden="true">
+          <div class="pv-phone"><div class="pv-bar"></div><div class="pv-ring"></div><div class="pv-line w70"></div><div class="pv-line w40"></div><div class="pv-chips"><i></i><i class="on"></i><i></i></div><div class="pv-btn"></div></div>
+        </div>
+        <div><h3>Lo que ve el grupo</h3><p>Sumate a un regalo de ejemplo: elegí un monto, dejá un mensaje y mirá cómo crece el total.</p></div>
+        <span class="go">Probar la demostración <svg><use href="#arrow"/></svg></span>
+      </a>
+      <a class="pv b reveal" href="{{ url_for('demo_gift') }}">
+        <div class="pv-art" aria-hidden="true">
+          <svg class="pv-box"><use href="#box"/></svg>
+        </div>
+        <div><h3>Lo que ve quien recibe</h3><p>Abrí un regalo, leé los mensajes del grupo y elegí cómo disfrutarlo.</p></div>
+        <span class="go">Abrir el regalo <svg><use href="#arrow"/></svg></span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- PRIVACY -->
+<section class="priv">
+  <div class="wrap">
+    <div class="ledger reveal" aria-hidden="true">
+      <header><b>Quiénes se sumaron</b><span>Vista del organizador</span></header>
+      <div class="row"><div class="av" style="background:#D8B872">LC</div><div class="nm">Lucas Correa<small>Hace 2 horas</small></div><span class="amt">$ 1.200</span><span class="ok">Se sumó</span></div>
+      <div class="row"><div class="av" style="background:#C9D6C5">AP</div><div class="nm">Ana Pereira<small>Hace 5 horas</small></div><span class="amt">$ 500</span><span class="ok">Se sumó</span></div>
+      <div class="row"><div class="av" style="background:#E3C9A8">JM</div><div class="nm">Juan Méndez<small>Ayer</small></div><span class="amt">$ 800</span><span class="ok">Se sumó</span></div>
+      <div class="row"><div class="av" style="background:#D6CFE0">RV</div><div class="nm">Rocío Vidal<small>Ayer</small></div><span class="amt">$ 2.000</span><span class="ok">Se sumó</span></div>
+      <div class="lfoot"><span>Total juntado</span><b>$ 18.400</b></div>
+    </div>
+    <div class="reveal">
+      <span class="kicker">Privacidad</span>
+      <h2 style="margin-top:18px">Nadie ve <em>cuánto pusiste.</em></h2>
+      <p class="lead" style="margin-top:22px">Cada persona aporta lo que desea, sin comparaciones. Quien organiza ve quién se sumó y el total reunido; el monto de cada aporte se mantiene privado.</p>
+      <ul>
+        <li><span class="tick"><svg><use href="#tick"/></svg></span><span><b>Para quien aporta:</b> libertad para aportar lo que considere.</span></li>
+        <li><span class="tick"><svg><use href="#tick"/></svg></span><span><b>Para quien organiza:</b> sabe quién se sumó, sin tener que preguntar.</span></li>
+        <li><span class="tick"><svg><use href="#tick"/></svg></span><span><b>Para quien recibe:</b> un regalo de todos, sin cifras de por medio.</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- EXPERIENCE -->
+<section class="dark exp" id="experiencia">
+  <div class="wrap">
+    <div>
+      <span class="kicker">La experiencia</span>
+      <h2>Un regalo que se abre, <em>no una transferencia.</em></h2>
+      <p class="lead">El momento más especial llega al final: quien recibe abre su regalo, ve quiénes participaron, lee cada mensaje y elige cómo disfrutarlo.</p>
+      <p class="fine">Gift cards y experiencias en viajes, supermercado, deporte, gastronomía, bienestar, moda y mucho más.</p>
+      <a class="btn btn-line" style="margin-top:30px" href="{{ url_for('demo_gift') }}">Abrir un regalo de ejemplo <svg><use href="#arrow"/></svg></a>
+    </div>
+    <div class="stage" id="stage" role="button" tabindex="0" aria-pressed="false" aria-label="Abrir la caja de regalo">
+      <div class="hint"><i></i>TOCÁ LA CAJA</div>
+      <div class="glow"></div>
+      <div class="burst" id="burst" aria-hidden="true"></div>
+      <div class="more" aria-hidden="true">y muchas opciones más</div>
+      <div class="box">
+        <div class="bd"></div><div class="rb"></div><div class="lid"></div>
+        <svg class="bow" viewBox="0 0 74 42" aria-hidden="true"><path d="M37 36c-8-21-32-19-30-6 1.5 7.5 15 8.5 30 6zM37 36c8-21 32-19 30-6-1.5 7.5-15 8.5-30 6z" fill="#EBD9AE"/><circle cx="37" cy="35" r="5.5" fill="#B98D34"/></svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- OCCASIONS -->
+<section class="occ">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div><span class="kicker">Ocasiones</span><h2>Un regalo para <em>cada momento.</em></h2></div>
+      <a class="btn btn-line" href="{{ url_for('page_occasions') }}">Ver todas las ocasiones <svg><use href="#arrow"/></svg></a>
+    </div>
+    <div class="covers">
+      {% for o in m.OCCASIONS[:8] %}{{ m.cover(o, url_for('page_occasions') ~ '#' ~ o[0]) }}{% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- BUSINESS -->
+<section class="biz" id="empresas" style="padding-top:0">
+  <div class="wrap">
+    <div class="panel">
+      <div class="l">
+        <span class="kicker">Vaka para empresas</span>
+        <h2>Los regalos del equipo, <em>resueltos.</em></h2>
+        <p class="lead">Cumpleaños, nacimientos y despedidas ocurren todos los meses en cualquier organización. Vaka simplifica los regalos en equipo y libera tiempo a quienes los coordinan.</p>
+        <div style="margin-top:32px;display:flex;gap:12px;flex-wrap:wrap">
+          <a class="btn btn-gold" href="{{ url_for('page_business') }}#demo">Pedir una demostración <svg><use href="#arrow"/></svg></a>
+          <a class="btn btn-line" href="{{ url_for('page_business') }}">Conocer más</a>
+        </div>
+      </div>
+      <div class="r">
+        <div class="uses">
+          <div><span class="n">i</span><div><b>Equipos de trabajo</b><span>Un regalo para cada ocasión, sin que nadie tenga que encargarse de reunir el dinero.</span></div></div>
+          <div><span class="n">ii</span><div><b>Recursos Humanos</b><span>Regalos para todo el personal, con libertad de elección para cada persona.</span></div></div>
+          <div><span class="n">iii</span><div><b>Fechas especiales</b><span>Fin de año, Día de la madre y del padre, aniversarios laborales.</span></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq" id="preguntas" style="padding-top:0">
+  <div class="wrap">
+    <div>
+      <span class="kicker">Preguntas frecuentes</span>
+      <h2>Todo lo que necesitás <em>saber.</em></h2>
+      <a class="btn btn-line" style="margin-top:28px" href="{{ url_for('page_help') }}">Ver todas las preguntas <svg><use href="#arrow"/></svg></a>
+    </div>
+    <div>
+      {% for f in m.FAQ if f[1] in ['¿Cuánto cuesta usar Vaka?', '¿Alguien puede ver cuánto aporté?', '¿Cómo se paga?', '¿Hace falta descargar una app o crear una cuenta?', '¿Qué puede elegir quien recibe?', '¿Quién maneja el dinero?'] %}{{ m.faq_item(f[1], f[2]) }}{% endfor %}
+    </div>
+  </div>
+</section>
+
+{{ m.final_cta() }}
+{% endblock %}

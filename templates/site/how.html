@@ -1,0 +1,92 @@
+{% extends 'site/base.html' %}
+{% import 'site/_macros.html' as m with context %}
+{% block title %}Cómo funciona — Vaka{% endblock %}
+{% block description %}Cómo se arma un regalo en grupo con Vaka: quien organiza crea el regalo, el grupo aporta en privado y quien recibe elige.{% endblock %}
+{% block content %}
+
+<section class="phero">
+  <div class="wrap">
+    <span class="kicker">Cómo funciona</span>
+    <h1>Un regalo de todos, <em>organizado en minutos.</em></h1>
+    <p class="lead">Vaka acompaña cada etapa del regalo: desde que alguien tiene la idea hasta que quien recibe elige cómo disfrutarlo.</p>
+    <div class="ctas">
+      <a class="btn btn-gold" href="{{ url_for('create_gift') }}">Armar un regalo <svg><use href="#arrow"/></svg></a>
+      <a class="btn btn-line" href="{{ url_for('demo_group') }}"><svg><use href="#i-play"/></svg> Ver una demostración</a>
+    </div>
+  </div>
+</section>
+
+<section class="how" style="background:transparent">
+  <div class="wrap">
+    {% include 'site/_steps.html' %}
+  </div>
+</section>
+
+<section class="roles" style="padding-top:0">
+  <div class="wrap">
+    <div class="sec-head reveal"><div><span class="kicker">Para cada persona</span><h2>Pensado para <em>los tres lados</em> del regalo.</h2></div></div>
+    <div class="grid3">
+      <div class="card role reveal">
+        <div class="ico"><svg><use href="#i-users"/></svg></div>
+        <h3>Quien organiza</h3>
+        <ul class="checks">
+          <li>Crea el regalo en un minuto, sin registrarse.</li>
+          <li>Recibe por mail su link privado de administración.</li>
+          <li>Ve quién se sumó y el total, en tiempo real.</li>
+          <li>No adelanta dinero ni cobra a nadie.</li>
+          <li>Cierra la colecta y comparte el regalo.</li>
+        </ul>
+      </div>
+      <div class="card role reveal">
+        <div class="ico"><svg><use href="#i-heart"/></svg></div>
+        <h3>Quien aporta</h3>
+        <ul class="checks">
+          <li>Entra desde el link, en el celular o la computadora.</li>
+          <li>Elige cuánto aportar, con total privacidad.</li>
+          <li>Paga con los medios habituales.</li>
+          <li>Deja un mensaje para quien recibe.</li>
+          <li>No necesita descargar nada ni crear una cuenta.</li>
+        </ul>
+      </div>
+      <div class="card role reveal">
+        <div class="ico"><svg><use href="#box"/></svg></div>
+        <h3>Quien recibe</h3>
+        <ul class="checks">
+          <li>Abre su regalo desde un link personal.</li>
+          <li>Ve quiénes participaron y lee cada mensaje.</li>
+          <li>Conoce el total del regalo, no los aportes individuales.</li>
+          <li>Elige entre gift cards y experiencias.</li>
+          <li>Disfruta algo que realmente quiere.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="dark money">
+  <div class="wrap">
+    <div class="reveal">
+      <span class="kicker">El dinero</span>
+      <h2 style="margin-top:18px">Cada aporte va <em>directo al regalo.</em></h2>
+      <p class="lead" style="margin-top:22px">Los aportes no pasan por la cuenta de quien organiza. Se procesan a través de plataformas de pago reconocidas, se reúnen en Vaka y se destinan al regalo que elige quien recibe.</p>
+    </div>
+    <div class="flow reveal" aria-hidden="true">
+      <div class="fnode"><svg><use href="#i-users"/></svg><b>El grupo aporta</b><span>Cada persona, en privado</span></div>
+      <i class="fline"></i>
+      <div class="fnode gold"><svg><use href="#i-shield"/></svg><b>Vaka reúne</b><span>Pagos procesados y protegidos</span></div>
+      <i class="fline"></i>
+      <div class="fnode"><svg><use href="#box"/></svg><b>Quien recibe elige</b><span>Gift cards y experiencias</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="faq">
+  <div class="wrap">
+    <div><span class="kicker">Preguntas</span><h2>Sobre cómo <em>funciona.</em></h2>
+      <a class="btn btn-line" style="margin-top:28px" href="{{ url_for('page_help') }}">Centro de ayuda <svg><use href="#arrow"/></svg></a></div>
+    <div>{% for f in m.FAQ if f[0] in ['Empezar', 'Organizar'] %}{{ m.faq_item(f[1], f[2]) }}{% endfor %}</div>
+  </div>
+</section>
+
+{{ m.final_cta() }}
+{% endblock %}

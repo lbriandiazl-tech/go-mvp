@@ -1,0 +1,82 @@
+{# Datos y piezas compartidas del sitio #}
+
+{% set OCCASIONS = [
+  ('cumpleanos', 'Cumpleaños', 'i-cake', 'cv-gold', 'Celebraciones', 'El regalo de cumpleaños que todos quieren hacer, sin que nadie tenga que salir a comprarlo.', 'Cumpleaños'),
+  ('casamientos', 'Casamientos', 'i-rings', 'cv-navy', 'Celebraciones', 'Una alternativa a la lista de bodas: los invitados aportan y la pareja elige su luna de miel, su casa o su próximo viaje.', 'Casamiento'),
+  ('aniversarios', 'Aniversarios', 'i-wine', 'cv-rose', 'Celebraciones', 'Para padres, abuelos o amigos: un regalo de toda la familia, a la altura de los años compartidos.', 'Aniversario'),
+  ('recibidas', 'Recibidas', 'i-cap', 'cv-sky', 'Celebraciones', 'Después de años de estudio, un regalo que acompaña lo que viene.', 'Recibida'),
+  ('nacimientos', 'Nacimientos', 'i-baby', 'cv-sage', 'Familia', 'Todo lo que una familia necesita al recibir a alguien nuevo, elegido por ellos.', 'Nacimiento'),
+  ('baby-showers', 'Baby showers', 'i-heart', 'cv-cream', 'Familia', 'Aportes de todos los invitados en un solo regalo, sin repetir objetos.', 'Baby shower'),
+  ('dia-de-la-madre', 'Día de la madre', 'i-spa', 'cv-rose', 'Familia', 'Hermanos, nietos y familia en un mismo regalo, para que elija lo que realmente le gusta.', 'Día de la madre'),
+  ('dia-del-padre', 'Día del padre', 'i-coffee', 'cv-kraft', 'Familia', 'Un regalo de toda la familia, sin tener que adivinar.', 'Día del padre'),
+  ('despedidas', 'Despedidas', 'i-wave', 'cv-ink', 'Trabajo', 'Cuando alguien deja el equipo, todos pueden sumarse, también quienes trabajan a distancia.', 'Despedida'),
+  ('jubilaciones', 'Jubilaciones', 'i-sun', 'cv-gold', 'Trabajo', 'Un reconocimiento a toda una carrera, con un regalo a la altura.', 'Jubilación'),
+  ('bienvenidas', 'Bienvenidas', 'i-briefcase', 'cv-sky', 'Trabajo', 'Recibir a alguien nuevo en el equipo con un gesto de todos.', 'Bienvenida'),
+  ('fin-de-ano', 'Fin de año', 'i-ticket', 'cv-navy', 'Trabajo', 'El regalo de fin de año para el equipo, el jefe o quien se lo haya ganado.', 'Fin de año'),
+] %}
+
+{% macro cover(o, href) -%}
+<a class="cover {{ o[3] }}" href="{{ href }}">
+  <span class="art" aria-hidden="true"><svg class="big"><use href="#{{ o[2] }}"/></svg></span>
+  <span class="m"><span>{{ o[4]|upper }}</span><svg class="go"><use href="#arrow"/></svg></span>
+  <span class="t">{{ o[1] }}</span>
+</a>
+{%- endmacro %}
+
+{% set FAQ = [
+  ('Empezar', '¿Cuánto cuesta usar Vaka?', 'Crear un regalo en Vaka es gratuito. Si corresponde algún costo de servicio al aportar, el detalle se muestra antes de confirmar el pago.'),
+  ('Empezar', '¿Hace falta descargar una app o crear una cuenta?', 'No. Vaka funciona desde el navegador del celular o la computadora. Quien organiza recibe por mail un link privado para administrar el regalo; quienes aportan no necesitan registrarse.'),
+  ('Empezar', '¿Cuánto tiempo lleva armar un regalo?', 'Alrededor de un minuto: para quién es, qué se celebra y, si querés, un aporte sugerido y una fecha de cierre. Después compartís el link.'),
+  ('Aportes', '¿Alguien puede ver cuánto aporté?', 'No. Ni los demás participantes ni quien organiza ven el monto de cada aporte. Se muestra quién se sumó y el total reunido.'),
+  ('Aportes', '¿Cómo se paga?', 'Desde el mismo link, con los medios de pago habituales a través de plataformas de pago reconocidas. Vaka no almacena los datos de tu tarjeta.'),
+  ('Aportes', '¿Hay un monto mínimo o fijo?', 'Quien organiza puede sugerir un monto, pero cada persona decide cuánto aportar.'),
+  ('Aportes', '¿Puedo dejar un mensaje?', 'Sí. Al aportar podés escribir un mensaje; quien recibe lo lee al abrir su regalo.'),
+  ('Organizar', '¿Quién maneja el dinero?', 'Los aportes no pasan por la cuenta de quien organiza. Se reúnen en Vaka y se destinan al regalo que elige quien recibe.'),
+  ('Organizar', '¿Cómo cierro el regalo y se lo entrego?', 'Desde tu panel de organizador cerrás la colecta y obtenés el link del regalo para compartir con quien lo recibe, por mensaje o en persona.'),
+  ('Organizar', 'Perdí el link de mi regalo, ¿qué hago?', 'Desde "Mis regalos" ingresás tu email y te reenviamos el acceso a los regalos que organizaste.'),
+  ('Recibir', '¿Qué puede elegir quien recibe?', 'Gift cards y experiencias de distintas categorías: viajes, gastronomía, bienestar, moda, deporte, supermercado y más.'),
+  ('Recibir', '¿Quien recibe ve cuánto puso cada uno?', 'No. Ve quiénes participaron, sus mensajes y el total del regalo.'),
+  ('Comercios', 'Tengo un comercio, ¿puedo estar en Vaka?', 'Sí. Completá el formulario en la sección Comercios y te contamos cómo formar parte.'),
+] %}
+
+{% macro faq_item(q, a) -%}
+<details><summary>{{ q }}<i></i></summary><p>{{ a }}</p></details>
+{%- endmacro %}
+
+{% macro final_cta(title='¿Hay un cumpleaños <em>cerca?</em>', lead='Creá el regalo en un minuto y compartí el link con el grupo.') -%}
+<section class="final">
+  <div class="wrap">
+    <div class="wrapped">
+      <svg class="bowbig" viewBox="0 0 74 42" aria-hidden="true"><path d="M37 36c-8-21-32-19-30-6 1.5 7.5 15 8.5 30 6zM37 36c8-21 32-19 30-6-1.5 7.5-15 8.5-30 6z" fill="#EBD9AE"/><circle cx="37" cy="35" r="5.5" fill="#B98D34"/></svg>
+      <div class="inner">
+        <span class="kicker">Empezá hoy</span>
+        <h2 style="margin-top:18px">{{ title|safe }}</h2>
+        <p class="lead">{{ lead }}</p>
+        <a class="btn btn-gold" href="{{ url_for('create_gift') }}">Armar un regalo <svg><use href="#arrow"/></svg></a>
+      </div>
+    </div>
+  </div>
+</section>
+{%- endmacro %}
+
+{% macro contact_form(action, sent, error, topics=None, company=False, cta='Enviar mensaje', placeholder='Contanos en qué te podemos ayudar.') -%}
+{% if sent %}
+<div class="form-ok" role="status">
+  <svg><use href="#tick"/></svg>
+  <div><b>¡Gracias! Recibimos tu mensaje.</b><span>Te respondemos a la brevedad al email que nos dejaste.</span></div>
+</div>
+{% else %}
+<form class="form" method="post" action="{{ action }}">
+  {% if error %}<div class="form-err" role="alert">{{ error }}</div>{% endif %}
+  <div class="f2">
+    <div><label for="cf-name">Nombre</label><input id="cf-name" name="name" autocomplete="name" required value="{{ request.form.get('name','') }}"></div>
+    <div><label for="cf-email">Email</label><input id="cf-email" name="email" type="email" autocomplete="email" required value="{{ request.form.get('email','') }}"></div>
+  </div>
+  {% if company %}<div><label for="cf-company">Empresa</label><input id="cf-company" name="company" autocomplete="organization" value="{{ request.form.get('company','') }}"></div>{% endif %}
+  {% if topics %}<div><label for="cf-topic">Tema</label><select id="cf-topic" name="topic">{% for t in topics %}<option{% if request.form.get('topic')==t %} selected{% endif %}>{{ t }}</option>{% endfor %}</select></div>{% endif %}
+  <div><label for="cf-msg">Mensaje</label><textarea id="cf-msg" name="message" rows="5" required placeholder="{{ placeholder }}">{{ request.form.get('message','') }}</textarea></div>
+  <input type="text" name="website" tabindex="-1" autocomplete="off" class="hp" aria-hidden="true">
+  <button class="btn btn-gold" type="submit">{{ cta }} <svg><use href="#arrow"/></svg></button>
+</form>
+{% endif %}
+{%- endmacro %}

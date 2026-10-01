@@ -1,0 +1,71 @@
+{% extends 'site/base.html' %}
+{% import 'site/_macros.html' as m with context %}
+{% block title %}Ayuda — Vaka{% endblock %}
+{% block description %}Preguntas frecuentes sobre Vaka: aportes, privacidad, pagos, cómo organizar un regalo y qué puede elegir quien recibe.{% endblock %}
+{% block content %}
+
+<section class="phero center">
+  <div class="wrap">
+    <span class="kicker">Centro de ayuda</span>
+    <h1>¿En qué te <em>ayudamos?</em></h1>
+    <p class="lead">Respuestas a las consultas más frecuentes. Si no encontrás lo que buscás, escribinos.</p>
+    <div class="help-search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m20 20-4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><input id="q" type="search" placeholder="Buscá una pregunta" aria-label="Buscar en preguntas frecuentes"></div>
+  </div>
+</section>
+
+<section class="help">
+  <div class="wrap help-grid">
+    <aside class="help-nav">
+      {% for cat in ['Empezar', 'Aportes', 'Organizar', 'Recibir', 'Comercios'] %}<a href="#{{ cat|lower }}">{{ cat }}</a>{% endfor %}
+      <a href="#contacto">Contacto</a>
+    </aside>
+    <div class="help-body">
+      {% for cat in ['Empezar', 'Aportes', 'Organizar', 'Recibir', 'Comercios'] %}
+      <div class="help-cat" id="{{ cat|lower }}">
+        <h2>{{ cat }}</h2>
+        <div class="faq-list">{% for f in m.FAQ if f[0] == cat %}{{ m.faq_item(f[1], f[2]) }}{% endfor %}</div>
+      </div>
+      {% endfor %}
+      <p class="no-res" id="nores" hidden>No encontramos preguntas con esa búsqueda. <a href="#contacto">Escribinos</a> y te ayudamos.</p>
+    </div>
+  </div>
+</section>
+
+<section id="contacto" class="contact-sec">
+  <div class="wrap demo-grid">
+    <div>
+      <span class="kicker">Contacto</span>
+      <h2 style="margin-top:18px">Escribinos.</h2>
+      <p class="lead" style="margin-top:20px">Te respondemos a la brevedad.</p>
+      <div class="contact-list">
+        <a href="mailto:{{ CONTACT_EMAIL }}"><svg><use href="#i-mail"/></svg><span><b>Email</b>{{ CONTACT_EMAIL }}</span></a>
+        <a href="{{ url_for('recover_access') }}"><svg><use href="#box"/></svg><span><b>¿Perdiste el link de tu regalo?</b>Recuperalo desde Mis regalos</span></a>
+        <a href="{{ url_for('page_business') }}#demo"><svg><use href="#i-briefcase"/></svg><span><b>Empresas</b>Pedí una demostración</span></a>
+      </div>
+    </div>
+    <div class="card form-card">
+      {{ m.contact_form(url_for('page_help') ~ '#contacto', sent, error, topics=['Consulta general', 'Un regalo que organizo', 'Un aporte que hice', 'Un regalo que recibí', 'Empresas', 'Comercios', 'Prensa']) }}
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function(){
+  var q=document.getElementById('q'), nores=document.getElementById('nores');
+  function norm(s){return s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');}
+  q.addEventListener('input',function(){
+    var t=norm(q.value.trim()), any=false;
+    document.querySelectorAll('.help-cat').forEach(function(c){
+      var vis=0;
+      c.querySelectorAll('details').forEach(function(d){
+        var ok=!t||norm(d.textContent).indexOf(t)>-1; d.hidden=!ok; if(ok){vis++; if(t) d.open=true;} else d.open=false;
+      });
+      c.hidden=vis===0; if(vis) any=true;
+    });
+    nores.hidden=any;
+  });
+})();
+</script>
+{% endblock %}

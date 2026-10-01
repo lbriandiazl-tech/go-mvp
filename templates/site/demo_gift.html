@@ -1,0 +1,84 @@
+{% extends 'site/base.html' %}
+{% block title %}Lo que ve quien recibe — Vaka{% endblock %}
+{% block description %}Abrí un regalo de ejemplo: mirá quiénes participaron, leé los mensajes y elegí cómo disfrutarlo.{% endblock %}
+{% block content %}
+
+<section class="dark gdemo">
+  <div class="wrap gd-wrap">
+    <div class="gd-head">
+      <span class="kicker">Demostración</span>
+      <h1>Lo que ve <em>quien recibe.</em></h1>
+      <p class="lead">Un regalo de ejemplo, de punta a punta: abrirlo, leer los mensajes y elegir.</p>
+    </div>
+
+    <div class="gd-stage" id="gd">
+      <!-- 1: cerrado -->
+      <div class="gd-s on" data-s="1">
+        <p class="gd-to">Para Sofía</p>
+        <h2>Tenés un regalo.</h2>
+        <button class="gd-box" id="gdOpen" aria-label="Abrir el regalo">
+          <span class="glow"></span>
+          <span class="box"><span class="bd"></span><span class="rb"></span><span class="lid"></span>
+            <svg class="bow" viewBox="0 0 74 42" aria-hidden="true"><path d="M37 36c-8-21-32-19-30-6 1.5 7.5 15 8.5 30 6zM37 36c8-21 32-19 30-6-1.5 7.5-15 8.5-30 6z" fill="#EBD9AE"/><circle cx="37" cy="35" r="5.5" fill="#B98D34"/></svg></span>
+        </button>
+        <p class="gd-hint"><i></i>Tocá la caja para abrirlo</p>
+      </div>
+
+      <!-- 2: total + mensajes -->
+      <div class="gd-s" data-s="2">
+        <p class="gd-to">De parte de 12 personas</p>
+        <h2 class="gd-total">$ 24.600</h2>
+        <div class="gd-avs"><span style="background:#D8B872">MP</span><span style="background:#C9D6C5">LC</span><span style="background:#E3C9A8">AP</span><span style="background:#D6CFE0">JM</span><span style="background:#E9CFC2">RV</span><span style="background:#C9D6E3">CT</span><span class="more">+6</span></div>
+        <div class="gd-msgs" id="gdMsgs">
+          <figure><blockquote>¡Feliz cumple, Sofi! Que este año venga con muchos viajes.</blockquote><figcaption>Martina</figcaption></figure>
+          <figure><blockquote>Te queremos mucho. Elegí algo que te haga feliz.</blockquote><figcaption>Lucas y Ana</figcaption></figure>
+          <figure><blockquote>Gracias por ser la mejor compañera de equipo. ¡A disfrutar!</blockquote><figcaption>Juan</figcaption></figure>
+          <figure><blockquote>Feliz cumpleaños. Que lo celebres a lo grande.</blockquote><figcaption>Rocío</figcaption></figure>
+        </div>
+        <button class="btn btn-gold" data-go="3">Elegir mi regalo <svg><use href="#arrow"/></svg></button>
+      </div>
+
+      <!-- 3: elegir -->
+      <div class="gd-s" data-s="3">
+        <p class="gd-to">Tu saldo: $ 24.600</p>
+        <h2>¿Cómo querés disfrutarlo?</h2>
+        <div class="gd-cats" id="gdCats">
+          {% for ic, t, d in [
+            ('i-suitcase','Escapadas','Hoteles y estadías'),('i-plane','Viajes','Pasajes y paquetes'),('i-dine','Gastronomía','Restaurantes'),
+            ('i-spa','Bienestar','Spa y masajes'),('i-shirt','Moda','Ropa y accesorios'),('i-bike','Deporte','Equipamiento'),
+            ('i-ticket','Espectáculos','Teatro y shows'),('i-cart','Supermercado','Compras del hogar'),('i-book','Libros','Librerías')
+          ] %}
+          <button data-t="{{ t }}"><svg><use href="#{{ ic }}"/></svg><b>{{ t }}</b><span>{{ d }}</span></button>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- 4: listo -->
+      <div class="gd-s" data-s="4">
+        <div class="done-ic"><svg><use href="#tick"/></svg></div>
+        <h2>¡Elegiste <em id="gdChoice">Escapadas</em>!</h2>
+        <p class="lead" style="margin:14px auto 28px">Te enviamos por email los detalles para usar tu regalo.</p>
+        <div class="gd-end">
+          <button class="btn btn-line" id="gdAgain">Ver de nuevo</button>
+          <a class="btn btn-gold" href="{{ url_for('create_gift') }}">Armar un regalo real <svg><use href="#arrow"/></svg></a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function(){
+  var root=document.getElementById('gd');
+  function go(n){root.querySelectorAll('.gd-s').forEach(function(s){s.classList.toggle('on',+s.dataset.s===n);});}
+  document.getElementById('gdOpen').addEventListener('click',function(){
+    root.classList.add('opening'); setTimeout(function(){go(2); root.classList.remove('opening');},900);
+  });
+  root.querySelectorAll('[data-go]').forEach(function(b){b.addEventListener('click',function(){go(+b.dataset.go);});});
+  root.querySelectorAll('#gdCats button').forEach(function(b){b.addEventListener('click',function(){document.getElementById('gdChoice').textContent=b.dataset.t; go(4);});});
+  document.getElementById('gdAgain').addEventListener('click',function(){go(1);});
+})();
+</script>
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends 'site/base.html' %}
+{% block title %}Política de privacidad — Vaka{% endblock %}
+{% block content %}
+<section class="phero">
+  <div class="wrap">
+    <span class="kicker">Legal</span>
+    <h1>Política de privacidad</h1>
+    <p class="lead">Última actualización: octubre de 2026.</p>
+  </div>
+</section>
+<section>
+  <div class="wrap">
+    <div class="prose">
+      <h2>1. Qué datos recopilamos</h2>
+      <ul>
+        <li><b>Quien organiza:</b> nombre y email, para enviarle el acceso de administración del regalo.</li>
+        <li><b>Quien aporta:</b> nombre, email, monto del aporte y mensaje opcional.</li>
+        <li><b>Quien recibe:</b> nombre y la opción que elige.</li>
+      </ul>
+      <p>Los datos de pago (por ejemplo, de tarjetas) son procesados directamente por los proveedores de pago y Vaka no los almacena.</p>
+
+      <h2>2. Para qué los usamos</h2>
+      <p>Para operar el regalo: registrar aportes, mostrar quién participó, enviar los links de acceso, entregar el regalo elegido y brindar soporte.</p>
+
+      <h2>3. Privacidad de los aportes</h2>
+      <p>El monto de cada aporte no se muestra a los demás participantes, a quien organiza ni a quien recibe. Solo se muestra el total reunido y quiénes participaron.</p>
+
+      <h2>4. Con quién los compartimos</h2>
+      <p>Solo con los proveedores necesarios para prestar el servicio (procesamiento de pagos, envío de emails, alojamiento) y con el comercio que entrega el regalo elegido, en la medida necesaria para el canje. No vendemos datos personales.</p>
+
+      <h2>5. Tus derechos</h2>
+      <p>De acuerdo con la Ley N.º 18.331 de Protección de Datos Personales, podés solicitar el acceso, rectificación, actualización o supresión de tus datos escribiendo a <a href="mailto:{{ CONTACT_EMAIL }}">{{ CONTACT_EMAIL }}</a>.</p>
+
+      <h2>6. Conservación</h2>
+      <p>Conservamos los datos mientras sean necesarios para operar el regalo y cumplir obligaciones legales.</p>
+
+      <h2>7. Contacto</h2>
+      <p>Por cualquier consulta sobre privacidad escribinos a <a href="mailto:{{ CONTACT_EMAIL }}">{{ CONTACT_EMAIL }}</a>.</p>
+    </div>
+  </div>
+</section>
+{% endblock %}

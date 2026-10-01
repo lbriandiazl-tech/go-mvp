@@ -1,0 +1,79 @@
+{% extends 'site/base.html' %}
+{% import 'site/_macros.html' as m with context %}
+{% block title %}Vaka para empresas — Regalos en equipo{% endblock %}
+{% block description %}Cumpleaños, nacimientos, despedidas y fechas especiales: Vaka simplifica los regalos en equipo para empresas y organizaciones.{% endblock %}
+{% block content %}
+
+<section class="phero biz-hero">
+  <div class="wrap">
+    <div>
+      <span class="kicker">Vaka para empresas</span>
+      <h1>Los regalos del equipo, <em>resueltos.</em></h1>
+      <p class="lead">En cualquier organización hay un cumpleaños, un nacimiento o una despedida todos los meses. Con Vaka, cada regalo se organiza en minutos y nadie tiene que encargarse de reunir el dinero.</p>
+      <div class="ctas">
+        <a class="btn btn-gold" href="#demo">Pedir una demostración <svg><use href="#arrow"/></svg></a>
+        <a class="btn btn-line" href="{{ url_for('create_gift') }}">Armar un regalo ahora</a>
+      </div>
+    </div>
+    <div class="biz-card reveal" aria-hidden="true">
+      <div class="bc-head"><b>Regalos del equipo</b><span>Octubre</span></div>
+      <div class="bc-row"><span class="dot" style="background:#D8B872"></span><div><b>Cumpleaños de Carolina</b><small>Equipo Comercial · 14 personas</small></div><span class="pill ok">Entregado</span></div>
+      <div class="bc-row"><span class="dot" style="background:#C9D6C5"></span><div><b>Nacimiento de Tomás</b><small>Operaciones · 22 personas</small></div><span class="pill">Abierto</span></div>
+      <div class="bc-row"><span class="dot" style="background:#E9CFC2"></span><div><b>Despedida de Martín</b><small>Toda la empresa · 48 personas</small></div><span class="pill">Abierto</span></div>
+      <div class="bc-row"><span class="dot" style="background:#C9D6E3"></span><div><b>Jubilación de Graciela</b><small>Administración · 31 personas</small></div><span class="pill gold">Cierra el viernes</span></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="sec-head reveal"><div><span class="kicker">Beneficios</span><h2>Menos coordinación, <em>mejores regalos.</em></h2></div></div>
+    <div class="grid3">
+      <div class="card reveal"><div class="ico"><svg><use href="#i-users"/></svg></div><h3>Todos pueden sumarse</h3><p>Equipos presenciales, remotos o en distintas sedes aportan desde el mismo link, sin efectivo ni transferencias entre compañeros.</p></div>
+      <div class="card reveal"><div class="ico"><svg><use href="#lock"/></svg></div><h3>Sin incomodidades</h3><p>Los aportes son privados. Nadie sabe cuánto puso cada uno y nadie tiene que perseguir a nadie para cobrar.</p></div>
+      <div class="card reveal"><div class="ico"><svg><use href="#box"/></svg></div><h3>Regalos que aciertan</h3><p>Quien recibe elige entre gift cards y experiencias. Se acabaron los regalos repetidos o que nadie usa.</p></div>
+      <div class="card reveal"><div class="ico"><svg><use href="#i-briefcase"/></svg></div><h3>Menos carga para RR. HH.</h3><p>Quien coordina los regalos deja de manejar dinero, planillas y compras de último momento.</p></div>
+      <div class="card reveal"><div class="ico"><svg><use href="#i-shield"/></svg></div><h3>Pagos ordenados</h3><p>Cada aporte se procesa a través de plataformas de pago reconocidas, con registro de cada movimiento.</p></div>
+      <div class="card reveal"><div class="ico"><svg><use href="#i-heart"/></svg></div><h3>Mejor clima de equipo</h3><p>Cada mensaje queda en el regalo. Un gesto colectivo que se siente, más allá del monto.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="how">
+  <div class="wrap">
+    <div class="sec-head reveal"><div><span class="kicker">Casos de uso</span><h2>Para cada fecha <em>del calendario.</em></h2></div></div>
+    <div class="uses-grid">
+      {% for t, d in [
+        ('Cumpleaños', 'El regalo del equipo para cada cumpleaños, sin que siempre lo organice la misma persona.'),
+        ('Nacimientos', 'Un regalo de toda la empresa para quienes agrandan la familia.'),
+        ('Despedidas y jubilaciones', 'Un reconocimiento a la altura, con aportes de todas las áreas.'),
+        ('Bienvenidas', 'Un gesto para quienes se suman al equipo.'),
+        ('Fin de año', 'El regalo para el equipo, el jefe o quien se lo haya ganado.'),
+        ('Fechas especiales', 'Día de la madre, del padre y aniversarios laborales.'),
+      ] %}
+      <div class="use reveal"><span class="n">{{ '%02d' % loop.index }}</span><div><b>{{ t }}</b><p>{{ d }}</p></div></div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section id="demo">
+  <div class="wrap demo-grid">
+    <div class="reveal">
+      <span class="kicker">Hablemos</span>
+      <h2 style="margin-top:18px">Pedí una <em>demostración.</em></h2>
+      <p class="lead" style="margin-top:20px">Te mostramos cómo funciona Vaka para tu organización y armamos juntos el primer regalo del equipo.</p>
+      <ul class="checks" style="margin-top:28px">
+        <li>Demostración de 20 minutos, por videollamada o en tu oficina.</li>
+        <li>Acompañamiento en el primer regalo.</li>
+        <li>Respuesta en el día hábil.</li>
+      </ul>
+    </div>
+    <div class="card form-card reveal">
+      {{ m.contact_form(url_for('page_business') ~ '#demo', sent, error, company=True, cta='Solicitar demostración', placeholder='¿Cuántas personas tiene tu equipo? ¿Qué ocasiones suelen celebrar?') }}
+    </div>
+  </div>
+</section>
+
+{{ m.final_cta('El próximo regalo del equipo, <em>con Vaka.</em>', 'Creá el regalo en un minuto y compartí el link con tus compañeros.') }}
+{% endblock %}

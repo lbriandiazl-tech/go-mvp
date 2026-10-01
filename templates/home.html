@@ -1,239 +1,654 @@
-{% extends "base.html" %}
-{% block title %}Vaka — Regalos en grupo{% endblock %}
-{% block bodyclass %}navy-page{% endblock %}
-{% block content %}
-<div class="wrap" style="padding-top:90px; text-align:center;">
-  <div class="wordmark">Vaka</div>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vaka — Regalos que se arman entre todos</title>
+<meta name="description" content="Armá un regalo en grupo desde un link: cada persona aporta en privado y quien recibe abre su regalo y elige qué quiere.">
+<meta property="og:title" content="Vaka — Regalos que se arman entre todos">
+<meta property="og:description" content="Un link, aportes privados y un regalo que se abre. Quien recibe elige.">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#101B26">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#101B26; --navy-2:#182A3F; --navy-3:#0A131C;
+    --cream:#F4EFE4; --paper:#ECE4D3; --card:#FBF8F1; --kraft:#E3D6BC;
+    --gold:#B98D34; --gold-2:#D8B872; --gold-3:#EBD9AE; --gold-ink:#7A5A1E;
+    --ink:#101B26; --ink-2:#4A4538; --ink-3:#7D7666;
+    --line:#DCD2BE; --line-d:rgba(244,239,228,.13);
+    --on-d:#F4EFE4; --on-d-2:#BFB8AA;
+    --serif:'Fraunces', Georgia, 'Times New Roman', serif;
+    --sans:'Inter', -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+    --ease:cubic-bezier(.22,1,.36,1);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--cream);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  img,svg{display:block;max-width:100%}
+  a{color:inherit}
+  .wrap{max-width:1180px;margin:0 auto;padding-inline:20px}
+  h1,h2,h3{font-family:var(--serif);font-weight:500;letter-spacing:-.015em;line-height:1.04;text-wrap:balance}
+  h2{font-size:clamp(36px,5.2vw,64px)}
+  h2 em,h1 em{font-style:italic;color:var(--gold-ink);font-weight:400}
+  .dark h2 em{color:var(--gold-2)}
+  .kicker{display:inline-flex;align-items:center;gap:10px;font-size:12.5px;letter-spacing:.18em;text-transform:uppercase;font-weight:700;color:var(--gold-ink)}
+  .kicker::before{content:"";width:22px;height:1.5px;background:currentColor}
+  .dark .kicker{color:var(--gold-2)}
+  .lead{font-size:clamp(17px,1.5vw,19.5px);color:var(--ink-2);max-width:54ch}
+  .dark .lead{color:var(--on-d-2)}
+  section{padding-block:clamp(76px,10vw,136px)}
+  .dark{background:var(--navy);color:var(--on-d)}
+  :focus-visible{outline:3px solid var(--gold);outline-offset:3px;border-radius:8px}
 
-  <div class="intro-video">
-    <div class="frame" id="introFrame">
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;font:600 16px/1 var(--sans);padding:17px 28px;border-radius:999px;text-decoration:none;border:1.5px solid transparent;cursor:pointer;transition:transform .2s var(--ease),background .2s,box-shadow .2s}
+  .btn svg{width:16px;height:16px;transition:transform .25s var(--ease)}
+  .btn:hover svg{transform:translateX(3px)}
+  .btn-gold{background:var(--gold);color:var(--navy-3);box-shadow:0 8px 24px -10px rgba(185,141,52,.7)}
+  .btn-gold:hover{background:#C79A3E}
+  .btn-line{border-color:var(--line);color:var(--ink)}
+  .btn-line:hover{background:var(--card)}
+  .dark .btn-line{border-color:var(--line-d);color:var(--on-d)}
+  .dark .btn-line:hover{background:var(--navy-2)}
 
-  <div class="wordmark">Vaka</div>
+  /* ---------- NAV ---------- */
+  .nav{position:sticky;top:0;z-index:30;background:rgba(244,239,228,.86);backdrop-filter:saturate(1.4) blur(12px);-webkit-backdrop-filter:saturate(1.4) blur(12px);border-bottom:1px solid transparent;transition:border-color .3s}
+  .nav.scrolled{border-bottom-color:var(--line)}
+  .nav .wrap{display:flex;align-items:center;justify-content:space-between;height:72px;gap:16px}
+  .logo{display:flex;align-items:center;gap:9px;text-decoration:none}
+  .logo b{font-family:var(--serif);font-weight:600;font-size:27px;letter-spacing:-.6px}
+  .logo svg{width:27px;height:27px;color:var(--gold)}
+  .nav ul{display:flex;gap:30px;list-style:none;font-size:15px;font-weight:500}
+  .nav ul a{text-decoration:none;color:var(--ink-2);transition:color .2s}
+  .nav ul a:hover{color:var(--ink)}
+  .nav .btn{padding:13px 20px;font-size:15px}
+  @media (max-width:860px){.nav ul{display:none}}
 
-  <!-- Escena 1 — intro -->
-  <div class="scene scene1" data-scene="0">
-    <div class="icon">
-      <svg viewBox="0 0 48 48"><rect x="10" y="20" width="28" height="20" rx="1"/><path d="M10 26 h28"/><rect x="21" y="20" width="6" height="20"/><path d="M24 20c-3-6-12-6-12 0h12zm0 0c3-6 12-6 12 0h-12z"/></svg>
+  /* ---------- HERO ---------- */
+  .hero{padding-block:clamp(40px,6vw,80px) clamp(70px,8vw,110px);position:relative}
+  .hero .wrap{display:grid;grid-template-columns:1.05fr .95fr;gap:48px;align-items:center}
+  .hero h1{font-size:clamp(50px,7.6vw,104px);margin:22px 0 26px}
+  .hero .ctas{display:flex;flex-wrap:wrap;gap:12px;margin-top:36px}
+  .hero .meta{display:flex;flex-wrap:wrap;gap:22px;margin-top:34px;font-size:14px;color:var(--ink-3)}
+  .hero .meta span{display:flex;align-items:center;gap:8px}
+  .hero .meta svg{width:16px;height:16px;color:var(--gold)}
+  @media (max-width:940px){.hero .wrap{grid-template-columns:1fr;gap:56px}}
+
+  /* hero scene */
+  .scene{position:relative;height:560px;max-width:520px;width:100%;margin-inline:auto}
+  .giftcard{position:absolute;left:50%;top:50%;width:330px;transform:translate(-50%,-50%) rotate(-3deg);background:var(--navy);color:var(--on-d);border-radius:28px;padding:28px 26px 26px;box-shadow:0 40px 80px -30px rgba(16,27,38,.55),0 2px 0 rgba(255,255,255,.04) inset}
+  .giftcard::before,.giftcard::after{content:"";position:absolute;background:linear-gradient(var(--gold-2),var(--gold));opacity:.9}
+  .giftcard::before{left:56px;top:0;bottom:0;width:10px}
+  .giftcard::after{left:0;right:0;top:62px;height:10px}
+  .gc-in{position:relative;z-index:1}
+  .gc-top{display:flex;justify-content:flex-end;font-size:11px;letter-spacing:.2em;font-weight:700;color:var(--gold-2)}
+  .ring{position:relative;width:150px;height:150px;margin:58px auto 16px}
+  .ring svg{width:150px;height:150px;transform:rotate(-90deg)}
+  .ring .val{position:absolute;inset:0;display:grid;place-items:center;text-align:center}
+  .ring .val strong{display:block;font-family:var(--serif);font-size:30px;font-weight:500;font-variant-numeric:tabular-nums;line-height:1}
+  .ring .val small{font-size:11.5px;color:var(--on-d-2);letter-spacing:.04em}
+  .giftcard h3{font-size:25px;text-align:center}
+  .giftcard .who{text-align:center;font-size:13px;color:var(--on-d-2);margin-top:4px}
+  .gc-btn{margin-top:20px;background:var(--gold);color:var(--navy-3);font-weight:700;font-size:14px;text-align:center;padding:13px;border-radius:999px}
+  .note{position:absolute;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px 14px;display:flex;gap:11px;align-items:center;box-shadow:0 18px 40px -18px rgba(16,27,38,.35);font-size:13.5px;line-height:1.35;max-width:250px;animation:float 6s ease-in-out infinite}
+  .note .av{flex:0 0 34px;height:34px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:12px;color:var(--navy)}
+  .note b{display:block;font-weight:600;font-size:13.5px}
+  .note span{color:var(--ink-3);font-size:12.5px}
+  .n1{left:-6px;top:56px;animation-delay:-1s}
+  .n2{right:-8px;top:200px;animation-delay:-3s}
+  .n3{left:6px;bottom:70px;animation-delay:-4.5s}
+  .tag{position:absolute;right:20px;bottom:18px;background:var(--gold-3);color:var(--gold-ink);font-weight:700;font-size:12px;letter-spacing:.06em;padding:8px 13px;border-radius:999px;animation:float 7s ease-in-out infinite;animation-delay:-2s}
+  @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+  @media (max-width:520px){
+    .scene{height:520px}
+    .giftcard{width:290px}
+    .note{max-width:210px;font-size:12.5px}
+    .n1{left:-4px;top:20px}.n2{display:none}.n3{right:-4px;left:auto;bottom:24px}
+    .tag{display:none}
+  }
+
+  /* ---------- MARQUEE ---------- */
+  .marquee{border-block:1px solid var(--line);background:var(--card);overflow:hidden;padding-block:22px}
+  .track{display:flex;gap:34px;width:max-content;animation:scroll 42s linear infinite;align-items:center}
+  .track span{font-family:var(--serif);font-style:italic;font-size:clamp(22px,2.4vw,30px);color:var(--ink);white-space:nowrap}
+  .track svg{width:20px;height:20px;color:var(--gold)}
+  @keyframes scroll{to{transform:translateX(-50%)}}
+
+  /* ---------- WHY ---------- */
+  .why .wrap{display:grid;grid-template-columns:.9fr 1.1fr;gap:64px;align-items:start}
+  .why h2{margin-top:18px}
+  .why .lead{margin-top:22px}
+  .points{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .point{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:28px 26px;transition:transform .3s var(--ease),box-shadow .3s}
+  .point:hover{transform:translateY(-4px);box-shadow:0 22px 40px -26px rgba(16,27,38,.35)}
+  .point .ico{width:48px;height:48px;border-radius:14px;background:var(--navy);display:grid;place-items:center;margin-bottom:22px}
+  .point .ico svg{width:24px;height:24px}
+  .point h3{font-size:23px;margin-bottom:8px}
+  .point p{font-size:15.5px;color:var(--ink-2)}
+  @media (max-width:940px){.why .wrap{grid-template-columns:1fr;gap:40px}}
+  @media (max-width:560px){.points{grid-template-columns:1fr}}
+
+  /* ---------- HOW ---------- */
+  .how{background:var(--paper)}
+  .how-head{display:flex;justify-content:space-between;align-items:end;gap:24px;flex-wrap:wrap}
+  .how-head h2{margin-top:18px;max-width:14ch}
+  .rail{display:grid;grid-template-columns:repeat(4,1fr);gap:22px;margin-top:56px}
+  .stepcard{display:flex;flex-direction:column;gap:20px}
+  .mini{background:var(--navy);border-radius:30px;padding:10px;box-shadow:0 26px 50px -30px rgba(16,27,38,.6)}
+  .mini .scr{background:var(--card);border-radius:22px;height:330px;padding:18px 16px;display:flex;flex-direction:column;gap:10px;overflow:hidden;font-size:13px}
+  .mini .scr.navy{background:var(--navy-2);color:var(--on-d)}
+  .scr .bar-top{display:flex;justify-content:space-between;font-size:10px;font-weight:700;letter-spacing:.18em;color:var(--gold-ink)}
+  .scr.navy .bar-top{color:var(--gold-2)}
+  .scr h4{font-family:var(--serif);font-weight:500;font-size:19px;line-height:1.15;margin-top:4px}
+  .fld{background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 11px}
+  .fld small{display:block;font-size:10.5px;color:var(--ink-3)}
+  .fld div{font-weight:600}
+  .pbtn{margin-top:auto;background:var(--gold);color:var(--navy-3);font-weight:700;text-align:center;border-radius:999px;padding:11px;font-size:13px}
+  .msg{background:#DCF3D9;border-radius:12px 12px 12px 3px;padding:10px 12px;font-size:12.5px;line-height:1.4;color:#1d2b1f;align-self:flex-start;max-width:92%}
+  .msg u{color:#1b6c3e;text-decoration:none;font-weight:600}
+  .linkcard{background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden;font-size:12px}
+  .linkcard .lc-img{height:70px;background:var(--navy);display:grid;place-items:center}
+  .linkcard .lc-img svg{width:34px;height:34px;color:var(--gold-2)}
+  .linkcard div:last-child{padding:8px 10px}
+  .linkcard b{display:block;font-size:12.5px}
+  .chips4{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+  .chips4 span{border:1px solid var(--line);background:#fff;border-radius:10px;padding:9px;text-align:center;font-weight:600}
+  .chips4 span.on{background:var(--navy);color:var(--on-d);border-color:var(--navy)}
+  .lock{display:flex;gap:7px;align-items:center;font-size:11.5px;color:var(--ink-3)}
+  .lock svg{width:13px;height:13px;color:var(--gold)}
+  .openbox{margin:16px auto 6px;width:84px;height:84px;color:var(--gold-2)}
+  .scr.navy p{font-size:12.5px;color:var(--on-d-2);text-align:center}
+  .scr.navy h4{text-align:center}
+  .cats{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+  .cats span{background:rgba(244,239,228,.1);border:1px solid var(--line-d);border-radius:999px;padding:5px 10px;font-size:11.5px}
+  .stepcard .num{font-family:var(--serif);font-style:italic;color:var(--gold-ink);font-size:20px}
+  .stepcard h3{font-size:24px;margin-top:2px}
+  .stepcard p{font-size:15.5px;color:var(--ink-2);margin-top:6px}
+  @media (max-width:1000px){
+    .rail{grid-template-columns:none;grid-auto-flow:column;grid-auto-columns:minmax(250px,72%);overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:14px}
+    .stepcard{scroll-snap-align:start}
+  }
+
+  /* ---------- PRIVACY ---------- */
+  .priv .wrap{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center}
+  .ledger{background:var(--card);border:1px solid var(--line);border-radius:26px;padding:26px;box-shadow:0 30px 60px -40px rgba(16,27,38,.4)}
+  .ledger header{display:flex;justify-content:space-between;align-items:baseline;padding-bottom:16px;border-bottom:1px solid var(--line)}
+  .ledger header b{font-family:var(--serif);font-weight:500;font-size:22px}
+  .ledger header span{font-size:13px;color:var(--ink-3)}
+  .row{display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid var(--line)}
+  .row:last-of-type{border-bottom:none}
+  .row .av{flex:0 0 38px;height:38px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:12.5px;color:var(--navy)}
+  .row .nm{flex:1;font-weight:600}
+  .row .nm small{display:block;font-weight:400;color:var(--ink-3);font-size:12.5px}
+  .row .amt{font-variant-numeric:tabular-nums;filter:blur(5px);user-select:none;color:var(--ink-2)}
+  .row .ok{font-size:12.5px;font-weight:600;color:#2E7D52;background:#E1F0E6;border-radius:999px;padding:4px 10px}
+  .ledger .lfoot{display:flex;justify-content:space-between;margin-top:16px;padding-top:16px;border-top:1.5px solid var(--ink)}
+  .ledger .lfoot b{font-family:var(--serif);font-weight:500;font-size:24px;font-variant-numeric:tabular-nums}
+  .priv ul{list-style:none;margin-top:28px;display:flex;flex-direction:column;gap:14px}
+  .priv li{display:flex;gap:12px;color:var(--ink-2)}
+  .priv li b{color:var(--ink)}
+  .tick{flex:0 0 22px;height:22px;border-radius:50%;background:var(--gold);display:grid;place-items:center;margin-top:2px}
+  .tick svg{width:12px;height:12px}
+  @media (max-width:940px){.priv .wrap{grid-template-columns:1fr;gap:44px}}
+  @media (max-width:520px){.ledger{padding:18px}.ledger header span{display:none}.row{gap:10px}.row .nm{font-size:14.5px}.row .amt{font-size:13px}.row .ok{font-size:11.5px;padding:3px 8px}}
+
+  /* ---------- EXPERIENCE ---------- */
+  .exp .wrap{display:grid;grid-template-columns:.95fr 1.05fr;gap:64px;align-items:center}
+  .exp h2{margin-top:18px}
+  .exp .lead{margin-top:22px}
+  .exp .fine{margin-top:22px;font-size:14px;color:var(--on-d-2)}
+  @media (max-width:940px){.exp .wrap{grid-template-columns:1fr;gap:44px}}
+  .stage{position:relative;height:560px;border-radius:30px;background:radial-gradient(ellipse at 50% 78%, #223652 0%, var(--navy-3) 72%);border:1px solid var(--line-d);overflow:hidden;cursor:pointer;display:grid;place-items:end center;padding-bottom:64px;-webkit-tap-highlight-color:transparent}
+  .stage .hint{position:absolute;top:24px;left:50%;transform:translateX(-50%);font-size:12px;letter-spacing:.2em;color:var(--on-d-2);display:flex;align-items:center;gap:8px;transition:opacity .3s}
+  .stage .hint i{width:7px;height:7px;border-radius:50%;background:var(--gold-2);animation:pulse 1.6s ease-in-out infinite}
+  @keyframes pulse{50%{opacity:.25}}
+  .stage.open .hint{opacity:0}
+  .box{position:relative;width:200px;height:158px;transition:transform .4s var(--ease)}
+  .stage:hover .box{transform:translateY(-3px) rotate(-1deg)}
+  .box .bd{position:absolute;inset:auto 0 0 0;height:124px;background:linear-gradient(180deg,#C49536,#A87E2C);border-radius:6px 6px 12px 12px}
+  .box .rb{position:absolute;left:50%;transform:translateX(-50%);width:26px;bottom:0;height:124px;background:var(--gold-2)}
+  .box .lid{position:absolute;left:-10px;right:-10px;top:0;height:42px;background:#CFA046;border-radius:7px;transform-origin:10% 100%;transition:transform .8s cubic-bezier(.3,1.5,.5,1)}
+  .box .lid::after{content:"";position:absolute;left:50%;transform:translateX(-50%);width:26px;top:0;bottom:0;background:var(--gold-3)}
+  .box .bow{position:absolute;left:50%;top:-30px;width:74px;transform:translateX(-50%);transition:opacity .3s}
+  .glow{position:absolute;left:50%;bottom:110px;width:520px;height:520px;transform:translateX(-50%) scale(.2);border-radius:50%;background:radial-gradient(circle,rgba(235,217,174,.55),rgba(235,217,174,0) 66%);opacity:0;transition:all .9s var(--ease)}
+  .stage.open .lid{transform:rotate(-58deg) translate(-6px,-34px)}
+  .stage.open .bow{opacity:0}
+  .stage.open .glow{opacity:1;transform:translateX(-50%) scale(1)}
+  .burst{position:absolute;inset:0;pointer-events:none;z-index:3}
+  .item{position:absolute;left:50%;bottom:150px;width:0;height:0;opacity:0;transform:translate(0,0) scale(.2) rotate(0deg);transition:transform .9s cubic-bezier(.25,1.35,.45,1),opacity .35s ease;transition-delay:calc(var(--i) * 45ms)}
+  .item .in{position:absolute;left:0;top:0;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:6px;animation:bob 5s ease-in-out infinite;animation-delay:calc(var(--i) * -370ms)}
+  .item .tile{width:var(--s,58px);height:var(--s,58px);border-radius:18px;background:var(--card);display:grid;place-items:center;box-shadow:0 14px 28px -10px rgba(0,0,0,.55);transform:rotate(var(--rot,0deg))}
+  .item.alt .tile{background:var(--gold-2)}
+  .item.dk .tile{background:var(--navy-2);border:1px solid var(--line-d)}
+  .item .tile svg{width:56%;height:56%;color:var(--navy)}
+  .item.dk .tile svg{color:var(--gold-2)}
+  .item .lb{font-size:12px;font-weight:600;color:var(--on-d);white-space:nowrap;letter-spacing:.01em;text-shadow:0 2px 8px rgba(0,0,0,.5)}
+  .stage.open .item{opacity:1;transform:translate(var(--x),var(--y)) scale(1)}
+  .more{position:absolute;left:50%;bottom:18px;transform:translate(-50%,10px);font-family:var(--serif);font-style:italic;font-size:19px;color:var(--gold-2);opacity:0;transition:all .6s ease 1s;white-space:nowrap}
+  .stage.open .more{opacity:1;transform:translate(-50%,0)}
+  @keyframes bob{0%,100%{margin-top:0}50%{margin-top:-7px}}
+  @media (max-width:560px){
+    .stage{height:540px}
+    .box{transform:scale(.82);transform-origin:bottom center}
+    .item .lb{font-size:10.5px}
+    .item .tile{border-radius:14px}
+  }
+
+  /* ---------- BUSINESS ---------- */
+  .biz .panel{display:grid;grid-template-columns:1.15fr .85fr;border-radius:32px;overflow:hidden;border:1px solid var(--line)}
+  .biz .l{background:var(--card);padding:clamp(32px,5vw,64px)}
+  .biz .r{background:var(--kraft);padding:clamp(32px,5vw,56px);display:flex;flex-direction:column;justify-content:space-between;gap:28px}
+  .biz h2{margin-top:18px;font-size:clamp(34px,4.4vw,54px)}
+  .biz .lead{margin-top:20px}
+  .uses{display:flex;flex-direction:column;gap:18px}
+  .uses > div{display:flex;gap:14px}
+  .uses b{display:block;font-family:var(--serif);font-weight:500;font-size:21px}
+  .uses span{font-size:15px;color:var(--ink-2)}
+  .uses .n{flex:0 0 36px;height:36px;border-radius:50%;border:1.5px solid var(--gold-ink);display:grid;place-items:center;font-family:var(--serif);font-style:italic;color:var(--gold-ink)}
+  .biz .contact{font-size:14.5px;color:var(--ink-2)}
+  .biz .contact a{font-weight:600;color:var(--gold-ink)}
+  @media (max-width:900px){.biz .panel{grid-template-columns:1fr}}
+
+  /* ---------- FAQ ---------- */
+  .faq .wrap{display:grid;grid-template-columns:.8fr 1.2fr;gap:64px}
+  .faq h2{margin-top:18px}
+  details{border-bottom:1px solid var(--line)}
+  details:first-child{border-top:1px solid var(--line)}
+  summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:20px;padding:24px 0;font-family:var(--serif);font-size:21px;font-weight:500}
+  summary::-webkit-details-marker{display:none}
+  summary i{flex:0 0 34px;height:34px;border-radius:50%;border:1.5px solid var(--line);display:grid;place-items:center;transition:transform .3s var(--ease),background .2s}
+  summary i::before{content:"+";font-family:var(--sans);font-style:normal;font-size:18px;color:var(--gold-ink)}
+  details[open] summary i{transform:rotate(45deg);background:var(--card)}
+  details p{padding:0 0 24px;color:var(--ink-2);max-width:62ch}
+  details a{color:var(--gold-ink);font-weight:600}
+  @media (max-width:900px){.faq .wrap{grid-template-columns:1fr;gap:32px}}
+
+  /* ---------- FINAL (wrapped gift) ---------- */
+  .final{padding-top:0}
+  .wrapped{position:relative;background:var(--navy);color:var(--on-d);border-radius:36px;padding:clamp(56px,8vw,104px) 24px;text-align:center;overflow:hidden}
+  .wrapped::before,.wrapped::after{content:"";position:absolute;background:linear-gradient(90deg,var(--gold),var(--gold-2),var(--gold));opacity:.95}
+  .wrapped::before{left:0;right:0;top:50%;height:14px;transform:translateY(-50%)}
+  .wrapped::after{top:0;bottom:0;left:clamp(40px,12%,140px);width:14px;background:linear-gradient(180deg,var(--gold),var(--gold-2),var(--gold))}
+  .wrapped .inner{position:relative;z-index:1;background:var(--navy);max-width:640px;margin:0 auto;padding:30px 22px;border-radius:24px}
+  .wrapped h2{font-size:clamp(38px,5.6vw,70px)}
+  .wrapped .lead{margin:20px auto 32px}
+  .wrapped .bowbig{position:absolute;z-index:2;left:calc(clamp(40px,12%,140px) - 33px);top:calc(50% - 30px);width:80px}
+
+  /* ---------- FOOTER ---------- */
+  footer{background:var(--navy-3);color:var(--on-d-2);padding-block:56px 40px;font-size:14.5px}
+  footer .top{display:flex;flex-wrap:wrap;justify-content:space-between;gap:28px;padding-bottom:36px;border-bottom:1px solid var(--line-d)}
+  footer .logo b{color:var(--on-d)}
+  footer .logo svg{color:var(--gold-2)}
+  footer p.tl{margin-top:12px;max-width:34ch}
+  footer nav{display:flex;gap:48px;flex-wrap:wrap}
+  footer nav div{display:flex;flex-direction:column;gap:10px}
+  footer nav strong{color:var(--on-d);font-weight:600;font-size:13px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:4px}
+  footer a{text-decoration:none}
+  footer a:hover{color:var(--on-d)}
+  footer .bottom{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;padding-top:24px;font-size:13.5px}
+
+  @media (prefers-reduced-motion: reduce){
+    *,*::before,*::after{animation:none !important;transition:none !important;scroll-behavior:auto !important}
+  }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="box" viewBox="0 0 48 48">
+      <path fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" d="M9 41 V23 H6 V18 H42 V23 H39 V41 Z"/>
+      <path fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" d="M21 18 V41 M27 18 V41"/>
+      <path fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" d="M24 18c-4-7-13-5-12 0 c0.6 3 5 3.5 9 2 M24 18c4-7 13-5 12 0 c-0.6 3-5 3.5-9 2"/>
+    </symbol>
+    <symbol id="tick" viewBox="0 0 12 12"><path d="M2 6.2 4.8 9 10 3" fill="none" stroke="#0A131C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="arrow" viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="lock" viewBox="0 0 16 16"><rect x="3" y="7" width="10" height="7" rx="1.6" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M5.5 7V5a2.5 2.5 0 0 1 5 0v2" fill="none" stroke="currentColor" stroke-width="1.5"/></symbol>
+
+    <symbol id="i-plane" viewBox="0 0 24 24"><path d="M21 15.5 13.5 11V5a1.5 1.5 0 0 0-3 0v6L3 15.5V17l7.5-2.3V19l-2 1.5V22l3.5-1 3.5 1v-1.5l-2-1.5v-4.3L21 17z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></symbol>
+    <symbol id="i-cart" viewBox="0 0 24 24"><path d="M2.5 3.5h3l2.3 11.2a1.5 1.5 0 0 0 1.5 1.2h8.6a1.5 1.5 0 0 0 1.5-1.1L21 8H6.6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="10" cy="20" r="1.5" fill="currentColor"/><circle cx="17.5" cy="20" r="1.5" fill="currentColor"/></symbol>
+    <symbol id="i-bike" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="5.5" cy="16" r="3.8"/><circle cx="18.5" cy="16" r="3.8"/><path d="M5.5 16 9.5 8.5h6.5L18.5 16M9.5 8.5 12.5 16h-7M15 5.5h2.5l-1.5 3"/><path d="M8 6h3"/></g></symbol>
+    <symbol id="i-dine" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3v6a2 2 0 0 0 4 0V3M9 3v18"/><path d="M17 21V3c-2 1.5-3 4-3 7v3h3"/></g></symbol>
+    <symbol id="i-spa" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20c-4 0-8-2.5-8-7 3 0 6 1.5 8 4 2-2.5 5-4 8-4 0 4.5-4 7-8 7z"/><path d="M12 17c-2-2.5-2-7 0-11 2 4 2 8.5 0 11z"/></g></symbol>
+    <symbol id="i-book" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M12 6.5C10 5 7 4.5 3.5 5v13c3.5-.5 6.5 0 8.5 1.5 2-1.5 5-2 8.5-1.5V5C17 4.5 14 5 12 6.5z"/><path d="M12 6.5v13"/></g></symbol>
+    <symbol id="i-ticket" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M3 8.5V6.5a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v2a2.5 2.5 0 0 0 0 5v2a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-2a2.5 2.5 0 0 0 0-5z"/><path d="M14.5 5.5v13" stroke-dasharray="1.8 1.8"/></g></symbol>
+    <symbol id="i-music" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15v-3a8 8 0 0 1 16 0v3"/><rect x="3" y="14" width="4" height="6" rx="1.5"/><rect x="17" y="14" width="4" height="6" rx="1.5"/></g></symbol>
+    <symbol id="i-shirt" viewBox="0 0 24 24"><path d="M8.5 3.5 3 6.5l2 4 2.5-1.2V20.5h9V9.3l2.5 1.2 2-4-5.5-3c-.5 1.6-1.9 2.6-3.5 2.6s-3-1-3.5-2.6z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></symbol>
+    <symbol id="i-camera" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M3 8a1.5 1.5 0 0 1 1.5-1.5h3l1.5-2h6l1.5 2h3A1.5 1.5 0 0 1 21 8v10a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 18z"/><circle cx="12" cy="13" r="3.8"/></g></symbol>
+    <symbol id="i-wine" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7.5 3h9c.5 5-1 9-4.5 9S7 8 7.5 3zM12 12v8M8.5 20.5h7"/><path d="M7.6 7h8.8"/></g></symbol>
+    <symbol id="i-suitcase" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><rect x="4" y="7" width="16" height="12.5" rx="2"/><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M8 7v12.5M16 7v12.5"/></g></symbol>
+    <symbol id="i-coffee" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h12v5a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5z"/><path d="M16 10.5h1.5a2.5 2.5 0 0 1 0 5H16M7 3.5c-.6 1 .6 2 0 3M10.5 3.5c-.6 1 .6 2 0 3M14 3.5c-.6 1 .6 2 0 3"/></g></symbol>
+    <symbol id="i-ball" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 8.2l3.6 2.6-1.4 4.2H9.8L8.4 10.8z"/><path d="M12 3.5v4.7M20.1 9.4l-4.5 1.4M17 19l-2.8-4M7 19l2.8-4M3.9 9.4l4.5 1.4"/></g></symbol>
+    <symbol id="i-plant" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 14h11l-1.5 7h-8z"/><path d="M12 14V9M12 9c0-3 2-5 6-5 0 3.5-2 5-6 5zM12 11c0-2.5-1.7-4.5-5-4.5 0 3 1.7 4.5 5 4.5z"/></g></symbol>
+    <symbol id="i-card" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><rect x="2.5" y="5.5" width="19" height="13" rx="2"/><path d="M2.5 10h19M6 15h4"/></g></symbol>
+    <symbol id="i-gamepad" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7.5h10a4.5 4.5 0 0 1 4.4 5.4l-.8 4a2.4 2.4 0 0 1-4.1 1.2L14.4 16H9.6l-2.1 2.1a2.4 2.4 0 0 1-4.1-1.2l-.8-4A4.5 4.5 0 0 1 7 7.5z"/><path d="M8 10.5v3M6.5 12h3M15.5 11.5h.01M17.5 13h.01"/></g></symbol>
+  </defs>
+</svg>
+
+<header class="nav" id="nav">
+  <div class="wrap">
+    <a class="logo" href="#top" aria-label="Vaka, inicio"><b>Vaka</b><svg><use href="#box"/></svg></a>
+    <nav aria-label="Principal">
+      <ul>
+        <li><a href="#como-funciona">Cómo funciona</a></li>
+        <li><a href="#experiencia">La experiencia</a></li>
+        <li><a href="#empresas">Empresas</a></li>
+        <li><a href="#preguntas">Preguntas</a></li>
+      </ul>
+    </nav>
+    <a class="btn btn-gold" href="{{ url_for('create_gift') }}">Armar un regalo</a>
+  </div>
+</header>
+
+<main id="top">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="wrap">
+      <div>
+        <span class="kicker">Regalos en grupo</span>
+        <h1>Regalos que se arman <em>entre todos.</em></h1>
+        <p class="lead">Compartís un link, cada persona aporta de forma privada y quien recibe elige su regalo. Simple para quien organiza, cómodo para quien aporta.</p>
+        <div class="ctas">
+          <a class="btn btn-gold" href="{{ url_for('create_gift') }}">Armar un regalo <svg><use href="#arrow"/></svg></a>
+          <a class="btn btn-line" href="#como-funciona">Cómo funciona</a>
+        </div>
+        <div class="meta">
+          <span><svg><use href="#lock"/></svg>Aportes privados</span>
+          <span><svg><use href="#box"/></svg>Elige quien recibe</span>
+          <span><svg viewBox="0 0 16 16"><rect x="4.5" y="1.5" width="7" height="13" rx="1.8" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>Sin descargar nada</span>
+        </div>
+      </div>
+
+      <div class="scene" aria-hidden="true">
+        <div class="giftcard">
+          <div class="gc-in">
+            <div class="gc-top">VAKA</div>
+            <div class="ring">
+              <svg viewBox="0 0 150 150"><circle cx="75" cy="75" r="64" fill="none" stroke="rgba(244,239,228,.12)" stroke-width="10"/><circle id="ringArc" cx="75" cy="75" r="64" fill="none" stroke="#D8B872" stroke-width="10" stroke-linecap="round" stroke-dasharray="402" stroke-dashoffset="113"/></svg>
+              <div class="val"><div><strong id="amt">$ 18.400</strong><small>juntados</small></div></div>
+            </div>
+            <h3>Cumpleaños de Sofía</h3>
+            <div class="who">12 personas se sumaron</div>
+            <div class="gc-btn">Sumarme al regalo</div>
+          </div>
+        </div>
+        <div class="note n1"><div class="av" style="background:#D8B872">LC</div><div><b>Lucas se sumó</b><span>"¡Feliz cumple, Sofi!"</span></div></div>
+        <div class="note n2"><div class="av" style="background:#C9D6C5">AP</div><div><b>Ana se sumó</b><span>"Que lo disfrutes mucho"</span></div></div>
+        <div class="note n3"><div class="av" style="background:#E3C9A8">JM</div><div><b>Juan se sumó</b><span>Su aporte es privado</span></div></div>
+        <div class="tag">CIERRA EL VIERNES</div>
+      </div>
     </div>
-    <div class="headline">Un regalo,<br>armado entre todos</div>
-    <div class="rule"></div>
-    <div class="subline">Fácil de organizar,<br>ágil y rápido</div>
-  </div>
+  </section>
 
-  <!-- Escena 2 — pasos -->
-  <div class="scene scene2" data-scene="1">
-    <div class="headline" style="font-size:18px;">Así funciona</div>
-    <div class="process">
-      <div class="p-step">
-        <div class="p-num">01</div>
-        <div class="p-icon"><svg viewBox="0 0 30 30"><circle cx="15" cy="10" r="5"/><path d="M6 25c0-6 4-10 9-10s9 4 9 10"/></svg></div>
-        <div class="p-connector"></div>
-        <div class="p-label">Aportás<br>tu parte</div>
-      </div>
-      <div class="p-step">
-        <div class="p-num">02</div>
-        <div class="p-icon"><svg viewBox="0 0 30 30"><circle cx="15" cy="15" r="4"/><circle cx="6" cy="8" r="2.2"/><circle cx="24" cy="8" r="2.2"/><circle cx="15" cy="25" r="2.2"/><path d="M8 10l5 3M22 10l-5 3M15 21v2"/></svg></div>
-        <div class="p-connector"></div>
-        <div class="p-label">Se reúne<br>el total</div>
-      </div>
-      <div class="p-step">
-        <div class="p-num">03</div>
-        <div class="p-icon"><svg viewBox="0 0 30 30"><rect x="6" y="12" width="18" height="13" rx="1"/><path d="M6 17h18M15 12v13"/><path d="M15 12c-2-4-8-4-8 0h8zm0 0c2-4 8-4 8 0h-8z"/></svg></div>
-        <div class="p-connector"></div>
-        <div class="p-label">Se entrega<br>el regalo</div>
-      </div>
+  <!-- MARQUEE -->
+  <div class="marquee" aria-label="Ocasiones">
+    <div class="track">
+      <span>Cumpleaños</span><svg><use href="#box"/></svg><span>Casamientos</span><svg><use href="#box"/></svg><span>Nacimientos</span><svg><use href="#box"/></svg><span>Baby showers</span><svg><use href="#box"/></svg><span>Despedidas</span><svg><use href="#box"/></svg><span>Recibidas</span><svg><use href="#box"/></svg><span>Jubilaciones</span><svg><use href="#box"/></svg><span>Aniversarios</span><svg><use href="#box"/></svg><span>Fin de año</span><svg><use href="#box"/></svg>
+      <span aria-hidden="true">Cumpleaños</span><svg><use href="#box"/></svg><span aria-hidden="true">Casamientos</span><svg><use href="#box"/></svg><span aria-hidden="true">Nacimientos</span><svg><use href="#box"/></svg><span aria-hidden="true">Baby showers</span><svg><use href="#box"/></svg><span aria-hidden="true">Despedidas</span><svg><use href="#box"/></svg><span aria-hidden="true">Recibidas</span><svg><use href="#box"/></svg><span aria-hidden="true">Jubilaciones</span><svg><use href="#box"/></svg><span aria-hidden="true">Aniversarios</span><svg><use href="#box"/></svg><span aria-hidden="true">Fin de año</span><svg><use href="#box"/></svg>
     </div>
   </div>
 
-  <!-- Escena 3 — privacidad -->
-  <div class="scene scene3" data-scene="2">
-    <div class="icon">
-      <svg viewBox="0 0 48 48"><path d="M24 6l16 6v10c0 11-7 17-16 20-9-3-16-9-16-20V12z"/><path d="M17 24l5 5 9-10"/></svg>
-    </div>
-    <div class="headline">Tu aporte,<br>protegido</div>
-    <div class="rule"></div>
-    <div class="subline">Ni los demás participantes ni el<br>organizador ven cuánto pusiste</div>
-  </div>
-
-  <!-- Escena 4 — organizador -->
-  <div class="scene scene4" data-scene="3">
-    <div class="headline" style="font-size:18px;">Quién coordina<br>este regalo</div>
-    <div class="org-card">
-      <div class="org-avatar"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.3"/><path d="M5 20c0-4 3-7 7-7s7 3 7 7"/></svg></div>
-      <div class="org-text">
-        <div class="org-name">Martina Pérez</div>
-        <div class="org-occasion">Cumpleaños de Juan</div>
+  <!-- WHY -->
+  <section class="why">
+    <div class="wrap">
+      <div>
+        <span class="kicker">Por qué Vaka</span>
+        <h2>Regalar en grupo no debería ser <em>un trámite.</em></h2>
+        <p class="lead">Reunir el dinero, coordinar a cada persona, adelantar pagos, acertar con el regalo. Vaka simplifica cada paso para que el foco esté en celebrar.</p>
+      </div>
+      <div class="points">
+        <div class="point">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="#D8B872" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v5c0 5.5-3.5 8.5-8 10-4.5-1.5-8-4.5-8-10V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg></div>
+          <h3>Aportes privados</h3><p>Cada persona aporta lo que desea. Se ve el total reunido, nunca el monto de cada aporte.</p>
+        </div>
+        <div class="point">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="#D8B872" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
+          <h3>Nadie adelanta dinero</h3><p>Cada persona aporta su parte directamente. Nadie tiene que comprar antes ni cobrar después.</p>
+        </div>
+        <div class="point">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="#D8B872" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16M14 6l6 6-6 6"/></svg></div>
+          <h3>Un solo link</h3><p>Se comparte por WhatsApp o mail y funciona desde el navegador, sin aplicaciones ni registros.</p>
+        </div>
+        <div class="point">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="#D8B872" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-4.4-9-9.2C1.6 8.3 4 5 7.3 5c2 0 3.5 1.1 4.7 2.6C13.2 6.1 14.7 5 16.7 5 20 5 22.4 8.3 21 11.8 19 16.6 12 21 12 21z"/></svg></div>
+          <h3>Elige quien recibe</h3><p>Quien recibe elige lo que realmente quiere. Un regalo que siempre acierta.</p>
+        </div>
       </div>
     </div>
-  </div>
+  </section>
 
-  <!-- Escena 5 — unboxing / reveal -->
-  <div class="scene scene5" data-scene="4">
-    <div class="headline" style="font-size:18px;">Así elige Juan<br>cómo disfrutarlo</div>
-    <div class="unbox-stage">
-      <div class="box-side"></div>
-      <div class="box-base"></div>
-      <div class="ribbon-h"></div>
-      <div class="ribbon-v"></div>
-      <div class="box-lid"></div>
-      <div class="bow">
-        <svg viewBox="0 0 32 26"><path d="M16 13c-4-9-14-6-13 0s8 4 13 0zM16 13c4-9 14-6 13 0s-8 4-13 0z"/><path d="M16 13l-4 10M16 13l4 10"/><circle cx="16" cy="13" r="2.2"/></svg>
+  <!-- HOW -->
+  <section class="how" id="como-funciona">
+    <div class="wrap">
+      <div class="how-head">
+        <div><span class="kicker">Cómo funciona</span><h2>De la idea al regalo, en <em>cuatro pasos.</em></h2></div>
+        <a class="btn btn-line" href="{{ url_for('create_gift') }}">Probarlo ahora <svg><use href="#arrow"/></svg></a>
       </div>
-      <div class="glow"></div>
-      <div class="reveal-cards">
-        <div class="r-card"><svg viewBox="0 0 24 24"><path d="M2 13l19-9-8 19-3-8-8-2z"/></svg><span>Viajes</span></div>
-        <div class="r-card"><svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="1.4"/><path d="M12 6.5v2M4 20l8-7 8 7M4 20h16"/></svg><span>Indumentaria</span></div>
-        <div class="r-card"><svg viewBox="0 0 24 24"><path d="M6 2v7c0 1.5 1 2 1 3v10M9 2v7c0 1.5-1 2-1 3M17 2c1.5 2 1.5 6 0 8v12"/></svg><span>Gastronomía</span></div>
-        <div class="r-card"><svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="10" rx="1"/><path d="M12 7v10" stroke-dasharray="2 2"/></svg><span>Espectáculos</span></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Escena 6 — CTA + cierre de marca -->
-  <div class="scene scene6" data-scene="5">
-    <div class="headline">Todo listo.</div>
-    <div class="cta-btn">Aportar ahora →</div>
-    <div class="cta-note"><span>Menos de un minuto</span><span class="note-sep"></span><span>Pago seguro</span></div>
-    <div class="brand-sign">
-      <div class="brand-rule"></div>
-      <div class="brand-word">Vaka</div>
-      <div class="brand-tagline">Regalos en grupo</div>
-    </div>
-  </div>
-
-    </div>
-  </div>
-
-  <h1 style="position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0);">Vaka — Un regalo, armado entre todos</h1>
-  <p class="subline" style="margin-top:26px;">Coordiná la vaquita para ese regalo grupal sin más idas y vueltas por WhatsApp.</p>
-  <a class="btn" href="{{ url_for('create_gift') }}">Crear un regalo</a>
-
-  <div id="my-gifts" style="display:none; margin-top:32px; text-align:left;">
-    <p class="muted" style="text-align:center; margin-bottom:12px;">Regalos que organizaste desde este dispositivo</p>
-    <div id="my-gifts-list"></div>
-  </div>
-
-  <p style="margin-top:20px;"><a href="{{ url_for('recover_access') }}" style="color:var(--gold-soft); font-size:12.5px;">¿Perdiste el link de un regalo? Recuperalo por mail</a></p>
-
-  <!-- Por qué Vaka -->
-  <div class="section">
-    <div class="section-title">Por qué Vaka</div>
-    <div style="text-align:left;">
-      <div class="feature-row">
-        <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M12 3l8 3v5c0 5.5-3.5 8.5-8 10-4.5-1.5-8-4.5-8-10V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg></div>
-        <div class="feature-text"><b>Aportes privados</b><span>Nadie ve cuánto puso cada uno — ni siquiera el organizador.</span></div>
-      </div>
-      <div class="feature-row">
-        <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M4 4h16v12H8l-4 4z"/></svg></div>
-        <div class="feature-text"><b>Se comparte por WhatsApp</b><span>Un link, un mensaje. Nada de bajar una app nueva.</span></div>
-      </div>
-      <div class="feature-row">
-        <div class="feature-icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="14" rx="1"/><path d="M3 9h18M8 13h4"/></svg></div>
-        <div class="feature-text"><b>La plata la custodia Vaka</b><span>Los aportes no pasan por la cuenta de nadie del grupo. Quedan resguardados y Vaka entrega el regalo elegido.</span></div>
-      </div>
-      <div class="feature-row">
-        <div class="feature-icon"><svg viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="0.5"/><path d="M4 14h16"/><rect x="10.5" y="10" width="3" height="11"/><path d="M12 10c-1.5-4-6-4-6 0h6zm0 0c1.5-4 6-4 6 0h-6z"/></svg></div>
-        <div class="feature-text"><b>El destinatario elige</b><span>Nada de regalos repetidos — arma su propia experiencia del catálogo.</span></div>
+      <div class="rail">
+        <div class="stepcard">
+          <div class="mini"><div class="scr">
+            <div class="bar-top"><span>VAKA</span><span>1/4</span></div>
+            <h4>Armemos el regalo</h4>
+            <div class="fld"><small>¿Para quién es?</small><div>Sofía</div></div>
+            <div class="fld"><small>¿Qué se festeja?</small><div>Cumpleaños</div></div>
+            <div class="fld"><small>Aporte sugerido</small><div>$ 500</div></div>
+            <div class="pbtn">Crear regalo</div>
+          </div></div>
+          <div><div class="num">01</div><h3>Armás el regalo</h3><p>Indicás para quién es, qué se celebra y un aporte sugerido. Lleva un minuto.</p></div>
+        </div>
+        <div class="stepcard">
+          <div class="mini"><div class="scr">
+            <div class="bar-top"><span>COMPARTIR</span><span>2/4</span></div>
+            <h4>Mandalo al grupo</h4>
+            <div class="msg">Estoy armando el regalo de cumple de Sofi 🎁 Sumate acá: <u>vaka.uy/sofia</u></div>
+            <div class="linkcard"><div class="lc-img"><svg><use href="#box"/></svg></div><div><b>Cumpleaños de Sofía</b>Organiza Martina · Vaka</div></div>
+          </div></div>
+          <div><div class="num">02</div><h3>Lo compartís</h3><p>Enviás el link por WhatsApp, mail o el canal que prefieras. Nadie necesita descargar nada.</p></div>
+        </div>
+        <div class="stepcard">
+          <div class="mini"><div class="scr">
+            <div class="bar-top"><span>APORTAR</span><span>3/4</span></div>
+            <h4>Sumá tu aporte</h4>
+            <div class="chips4"><span>$ 500</span><span class="on">$ 800</span><span>$ 1.200</span><span>Otro</span></div>
+            <div class="fld"><small>Mensaje para Sofía</small><div>¡Feliz cumple! 🎉</div></div>
+            <div class="lock"><svg><use href="#lock"/></svg>Tu aporte es privado</div>
+            <div class="pbtn">Aportar $ 800</div>
+          </div></div>
+          <div><div class="num">03</div><h3>Cada uno se suma</h3><p>Cada persona aporta desde su celular, de forma privada, y deja un mensaje.</p></div>
+        </div>
+        <div class="stepcard">
+          <div class="mini"><div class="scr navy">
+            <div class="bar-top"><span>PARA SOFÍA</span><span>4/4</span></div>
+            <svg class="openbox"><use href="#box"/></svg>
+            <h4>Tenés un regalo</h4>
+            <p>Martina, Lucas, Ana y 9 personas más te regalaron $ 24.600</p>
+            <div class="cats"><span>Escapadas</span><span>Gastronomía</span><span>Bienestar</span><span>Moda</span></div>
+            <div class="pbtn">Elegir mi regalo</div>
+          </div></div>
+          <div><div class="num">04</div><h3>Abre y elige</h3><p>Quien recibe abre su regalo, lee los mensajes y elige cómo usarlo.</p></div>
+        </div>
       </div>
     </div>
-  </div>
+  </section>
+
+  <!-- PRIVACY -->
+  <section class="priv">
+    <div class="wrap">
+      <div class="ledger" aria-hidden="true">
+        <header><b>Quiénes se sumaron</b><span>Vista del organizador</span></header>
+        <div class="row"><div class="av" style="background:#D8B872">LC</div><div class="nm">Lucas Correa<small>Hace 2 horas</small></div><span class="amt">$ 1.200</span><span class="ok">Se sumó</span></div>
+        <div class="row"><div class="av" style="background:#C9D6C5">AP</div><div class="nm">Ana Pereira<small>Hace 5 horas</small></div><span class="amt">$ 500</span><span class="ok">Se sumó</span></div>
+        <div class="row"><div class="av" style="background:#E3C9A8">JM</div><div class="nm">Juan Méndez<small>Ayer</small></div><span class="amt">$ 800</span><span class="ok">Se sumó</span></div>
+        <div class="row"><div class="av" style="background:#D6CFE0">RV</div><div class="nm">Rocío Vidal<small>Ayer</small></div><span class="amt">$ 2.000</span><span class="ok">Se sumó</span></div>
+        <div class="lfoot"><span>Total juntado</span><b>$ 18.400</b></div>
+      </div>
+      <div>
+        <span class="kicker">Privacidad</span>
+        <h2 style="margin-top:18px">Nadie ve <em>cuánto pusiste.</em></h2>
+        <p class="lead" style="margin-top:22px">Cada persona aporta lo que desea, sin comparaciones. Quien organiza ve quién se sumó y el total reunido; el monto de cada aporte se mantiene privado.</p>
+        <ul>
+          <li><span class="tick"><svg><use href="#tick"/></svg></span><span><b>Para quien aporta:</b> libertad para aportar lo que considere.</span></li>
+          <li><span class="tick"><svg><use href="#tick"/></svg></span><span><b>Para quien organiza:</b> sabe quién se sumó, sin tener que preguntar.</span></li>
+          <li><span class="tick"><svg><use href="#tick"/></svg></span><span><b>Para quien recibe:</b> un regalo de todos, sin cifras de por medio.</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- EXPERIENCE -->
+  <section class="dark exp" id="experiencia">
+    <div class="wrap">
+      <div>
+        <span class="kicker">La experiencia</span>
+        <h2>Un regalo que se abre, <em>no una transferencia.</em></h2>
+        <p class="lead">El momento más especial llega al final: quien recibe abre su regalo, ve quiénes participaron, lee cada mensaje y elige cómo disfrutarlo.</p>
+        <p class="fine">Gift cards y experiencias en viajes, supermercado, deporte, gastronomía, bienestar, moda y mucho más.</p>
+      </div>
+      <div class="stage" id="stage" role="button" tabindex="0" aria-pressed="false" aria-label="Abrir la caja de regalo">
+        <div class="hint"><i></i>TOCÁ LA CAJA</div>
+        <div class="glow"></div>
+        <div class="burst" id="burst" aria-hidden="true"></div>
+        <div class="more" aria-hidden="true">y muchas opciones más</div>
+        <div class="box">
+          <div class="bd"></div><div class="rb"></div><div class="lid"></div>
+          <svg class="bow" viewBox="0 0 74 42" aria-hidden="true"><path d="M37 36c-8-21-32-19-30-6 1.5 7.5 15 8.5 30 6zM37 36c8-21 32-19 30-6-1.5 7.5-15 8.5-30 6z" fill="#EBD9AE"/><circle cx="37" cy="35" r="5.5" fill="#B98D34"/></svg>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BUSINESS -->
+  <section class="biz" id="empresas">
+    <div class="wrap">
+      <div class="panel">
+        <div class="l">
+          <span class="kicker">Vaka para empresas</span>
+          <h2>Los regalos del equipo, <em>resueltos.</em></h2>
+          <p class="lead">Cumpleaños, nacimientos y despedidas ocurren todos los meses en cualquier organización. Vaka simplifica los regalos en equipo y libera tiempo a quienes los coordinan.</p>
+          <div style="margin-top:32px"><a class="btn btn-gold" href="mailto:briandiaz@vaka.uy?subject=Vaka%20para%20empresas">Pedir una demostración <svg><use href="#arrow"/></svg></a></div>
+        </div>
+        <div class="r">
+          <div class="uses">
+            <div><span class="n">i</span><div><b>Equipos de trabajo</b><span>Un regalo para cada ocasión, sin que nadie tenga que encargarse de reunir el dinero.</span></div></div>
+            <div><span class="n">ii</span><div><b>Recursos Humanos</b><span>Regalos para todo el personal, con libertad de elección para cada persona.</span></div></div>
+            <div><span class="n">iii</span><div><b>Fechas especiales</b><span>Fin de año, Día de la madre y del padre, aniversarios laborales.</span></div></div>
+          </div>
+          <div class="contact">Escribinos a <a href="mailto:briandiaz@vaka.uy">briandiaz@vaka.uy</a></div>
+        </div>
+      </div>
+    </div>
+  </section>
 
   <!-- FAQ -->
-  <div class="section">
-    <div class="section-title">Preguntas frecuentes</div>
-    <div style="text-align:left;">
-      <details class="faq">
-        <summary>¿Vaka es gratis?</summary>
-        <p>Sí, crear y organizar un regalo no tiene costo. No hay suscripciones ni planes.</p>
-      </details>
-      <details class="faq">
-        <summary>¿Cómo se aporta?</summary>
-        <p>Con Mercado Pago (tarjeta o saldo, se confirma al instante) o por transferencia bancaria a una cuenta de Vaka, con una referencia única para identificar tu pago.</p>
-      </details>
-      <details class="faq">
-        <summary>¿Quién guarda la plata?</summary>
-        <p>Vaka, no el organizador. Todos los aportes entran a cuentas de Vaka y quedan resguardados hasta que el homenajeado elige su regalo. Después Vaka se encarga de conseguirlo y entregarlo. El organizador nunca tiene que adelantar ni manejar dinero de otros.</p>
-      </details>
-      <details class="faq">
-        <summary>¿Qué hace el organizador?</summary>
-        <p>Crea el regalo, comparte el link por WhatsApp, ve quién ya se sumó y el total juntado, y cierra la colecta cuando quiere.</p>
-      </details>
-      <details class="faq">
-        <summary>¿Los demás ven cuánto aporté?</summary>
-        <p>No. Ni los otros participantes ni el organizador ven el monto — solo que ya aportaste.</p>
-      </details>
-      <details class="faq">
-        <summary>¿Hace falta descargar una app?</summary>
-        <p>No, todo funciona desde el navegador del celular, tablet o compu — ni el organizador ni quienes aportan necesitan instalar nada.</p>
-      </details>
-      <details class="faq">
-        <summary>¿Qué elige el destinatario?</summary>
-        <p>Al cerrar la colecta, el destinatario abre su regalo y elige entre las experiencias disponibles del catálogo: viajes, gastronomía, indumentaria y espectáculos.</p>
-      </details>
+  <section class="faq" id="preguntas" style="padding-top:0">
+    <div class="wrap">
+      <div>
+        <span class="kicker">Preguntas frecuentes</span>
+        <h2>Todo lo que necesitás <em>saber.</em></h2>
+      </div>
+      <div>
+        <details><summary>¿Cuánto cuesta usar Vaka?<i></i></summary><p>Crear un regalo en Vaka es gratuito. Si corresponde algún costo de servicio, el detalle se muestra siempre antes de confirmar el pago.</p></details>
+        <details><summary>¿Alguien puede ver cuánto aporté?<i></i></summary><p>No. Ni los demás participantes ni quien organiza ven el monto de cada aporte; solo se muestra quién se sumó y el total reunido.</p></details>
+        <details><summary>¿Cómo se aporta?<i></i></summary><p>Desde el mismo link, en el celular o la computadora. Los pagos se procesan a través de plataformas de pago reconocidas, y Vaka no almacena los datos de tu tarjeta.</p></details>
+        <details><summary>¿Hace falta descargar una app?<i></i></summary><p>No. Vaka funciona directamente desde el navegador; nadie necesita instalar nada.</p></details>
+        <details><summary>¿Qué puede elegir quien recibe?<i></i></summary><p>Gift cards y experiencias en viajes, gastronomía, bienestar, moda, deporte y mucho más.</p></details>
+        <details><summary>Tengo un comercio, ¿puedo estar en Vaka?<i></i></summary><p>Sí. Escribinos a <a href="mailto:briandiaz@vaka.uy">briandiaz@vaka.uy</a> y te contamos cómo formar parte.</p></details>
+      </div>
     </div>
-  </div>
+  </section>
 
-  <div class="section" style="margin-bottom:20px;">
-    <a class="btn" href="{{ url_for('create_gift') }}">Crear un regalo</a>
+  <!-- FINAL -->
+  <section class="final">
+    <div class="wrap">
+      <div class="wrapped">
+        <svg class="bowbig" viewBox="0 0 74 42" aria-hidden="true"><path d="M37 36c-8-21-32-19-30-6 1.5 7.5 15 8.5 30 6zM37 36c8-21 32-19 30-6-1.5 7.5-15 8.5-30 6z" fill="#EBD9AE"/><circle cx="37" cy="35" r="5.5" fill="#B98D34"/></svg>
+        <div class="inner">
+          <span class="kicker">Empezá hoy</span>
+          <h2 style="margin-top:18px">¿Hay un cumpleaños <em>cerca?</em></h2>
+          <p class="lead">Creá el regalo en un minuto y compartí el link con el grupo.</p>
+          <a class="btn btn-gold" href="{{ url_for('create_gift') }}">Armar un regalo <svg><use href="#arrow"/></svg></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="top">
+      <div>
+        <a class="logo" href="#top" aria-label="Vaka, volver arriba"><b>Vaka</b><svg><use href="#box"/></svg></a>
+        <p class="tl">Regalos que se arman entre todos. Montevideo, Uruguay.</p>
+      </div>
+      <nav aria-label="Pie de página">
+        <div><strong>Producto</strong><a href="#como-funciona">Cómo funciona</a><a href="#experiencia">La experiencia</a><a href="#preguntas">Preguntas</a></div>
+        <div><strong>Empresas</strong><a href="#empresas">Vaka para empresas</a><a href="mailto:briandiaz@vaka.uy?subject=Quiero%20sumar%20mi%20comercio">Sumar mi comercio</a></div>
+        <div><strong>Contacto</strong><a href="mailto:briandiaz@vaka.uy">briandiaz@vaka.uy</a><a href="{{ url_for('recover_access') }}">Recuperar un regalo</a></div>
+      </nav>
+    </div>
+    <div class="bottom"><span>© 2026 Vaka</span><span>Montevideo · Uruguay</span></div>
   </div>
-</div>
+</footer>
 
 <script>
-(function(){
+  (function(){
+    var nav=document.getElementById('nav');
+    var onScroll=function(){ nav.classList.toggle('scrolled', window.scrollY>8); };
+    window.addEventListener('scroll', onScroll, {passive:true}); onScroll();
 
-  const scenes = document.querySelectorAll('.scene');
-  const durations = [3400, 3800, 3800, 3400, 4400, 3200];
-  let current = -1;
-  let timer;
+    var stage=document.getElementById('stage');
+    function toggle(){ var o=stage.classList.toggle('open'); stage.setAttribute('aria-pressed', o?'true':'false'); }
+    stage.addEventListener('click', toggle);
+    stage.addEventListener('keydown', function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); toggle(); } });
 
-  function showScene(i){
-    scenes.forEach((s, idx) => {
-      s.classList.remove('active');
-      if(idx === i){
-        s.querySelectorAll('*').forEach(el=>{
-          el.style.animation = 'none';
-          void el.offsetWidth;
-          el.style.animation = '';
-        });
-        s.classList.add('active');
-      }
+
+    // Regalo: lo que sale de la caja
+    var ITEMS=[
+      ['i-plane','Viajes',''],['i-cart','Supermercado','alt'],['i-bike','Deporte','dk'],['i-dine','Gastronomía',''],
+      ['i-spa','Bienestar','alt'],['i-book','Libros','dk'],['i-ticket','Espectáculos',''],['i-music','Música','alt'],
+      ['i-shirt','Moda','dk'],['i-camera','Experiencias',''],['i-wine','Vinos','alt'],['i-suitcase','Escapadas','dk'],
+      ['i-coffee','Cafeterías',''],['i-ball','Fútbol','alt'],['i-plant','Hogar','dk'],['i-card','Gift cards',''],['i-gamepad','Juegos','alt']
+    ];
+    var burst=document.getElementById('burst');
+    ITEMS.forEach(function(it,i){
+      var d=document.createElement('div'); d.className='item '+it[2]; d.style.setProperty('--i',i);
+      d.style.setProperty('--rot',((i%3)-1)*6+'deg');
+      d.innerHTML='<div class="in"><div class="tile"><svg><use href="#'+it[0]+'"/></svg></div><span class="lb">'+it[1]+'</span></div>';
+      burst.appendChild(d);
     });
-  }
-
-  function next(){
-    current = (current + 1) % scenes.length;
-    showScene(current);
-    timer = setTimeout(next, durations[current]);
-  }
-
-  function restart(){
-    clearTimeout(timer);
-    current = -1;
-    next();
-  }
-
-  // Reinicio silencioso para revisión interna — no visible en el video final
-  document.addEventListener('keydown', e => { if(e.key === 'r') restart(); });
-
-  next();
-
-})();
-</script>
-<script>
-  try {
-    const saved = JSON.parse(localStorage.getItem('vaka_organized_gifts') || '[]');
-    if(saved.length > 0){
-      const box = document.getElementById('my-gifts');
-      const list = document.getElementById('my-gifts-list');
-      saved.forEach(g => {
-        const row = document.createElement('a');
-        row.href = g.url;
-        row.style.cssText = 'display:block; padding:14px 16px; border:1px solid var(--line-dark); margin-bottom:8px; color:var(--cream); text-decoration:none; font-size:13.5px;';
-        row.textContent = g.occasion;
-        list.appendChild(row);
-      });
-      box.style.display = 'block';
+    function layout(){
+      var W=stage.clientWidth, H=stage.clientHeight, small=W<520;
+      var rowsDesk=[[9,[-34,-11,11,34]],[26,[-40,-20,0,20,40]],[44,[-34,-11,11,34]],[61,[-40,-24,24,40]]];
+      var rowsMob=[[11,[-34,-11,11,34]],[27,[-34,-11,11,34]],[43,[-34,-11,11,34]],[59,[-37,-14,14,37]]];
+      var rows=small?rowsMob:rowsDesk, pos=[];
+      rows.forEach(function(r){ r[1].forEach(function(x){ pos.push([x,r[0]]); }); });
+      var items=burst.children, jit=[[1.5,-1],[-1,1.5],[0.5,-1.5],[-1.5,0.5],[1,1],[-0.5,-1.5],[1.5,0.5],[-1,-0.5]];
+      for(var i=0;i<items.length;i++){
+        var el=items[i], p=pos[i];
+        if(p){ var j=jit[i%jit.length]; p=[p[0]+j[0], p[1]+j[1]]; }
+        if(!p){ el.style.display='none'; continue; }
+        el.style.display='';
+        el.style.setProperty('--x',(p[0]/100*W).toFixed(1)+'px');
+        el.style.setProperty('--y',(p[1]/100*H-(H-150)).toFixed(1)+'px');
+        el.style.setProperty('--s',(small?44:54)+'px');
+      }
     }
-  } catch(e) {}
+    layout(); window.addEventListener('resize',layout);
+
+    // Hero: suma de aportes en vivo (ilustrativo)
+    var reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var amtEl=document.getElementById('amt'), arc=document.getElementById('ringArc');
+    var steps=[18400,19200,20400,21200,22600,24600], goal=28000, i=0;
+    function fmt(n){ return '$ '+n.toLocaleString('es-UY'); }
+    function show(n){ amtEl.textContent=fmt(n); arc.setAttribute('stroke-dashoffset', String(402*(1-n/goal))); }
+    show(steps[0]);
+    if(!reduce){ setInterval(function(){ i=(i+1)%steps.length; show(steps[i]); }, 2600); }
+    arc.style.transition='stroke-dashoffset 1.2s cubic-bezier(.22,1,.36,1)';
+  })();
 </script>
-{% endblock %}
+</body>
+</html>

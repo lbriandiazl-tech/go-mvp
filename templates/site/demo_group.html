@@ -1,0 +1,134 @@
+{% extends 'site/base.html' %}
+{% block title %}Lo que ve el grupo — Vaka{% endblock %}
+{% block description %}Probá cómo se aporta a un regalo en Vaka: elegí un monto, dejá un mensaje y mirá cómo crece el total.{% endblock %}
+{% block content %}
+
+<section class="demo">
+  <div class="wrap demo-wrap">
+    <div class="demo-side">
+      <span class="kicker">Demostración</span>
+      <h1>Lo que ve <em>el grupo.</em></h1>
+      <p class="lead">Así se ve un regalo cuando alguien recibe el link. Probá sumarte: no se realiza ningún pago.</p>
+      <ol class="dsteps" id="dsteps">
+        <li class="on"><b>Abrís el link</b><span>Ves para quién es el regalo, quiénes se sumaron y el total.</span></li>
+        <li><b>Elegís tu aporte</b><span>El monto que quieras. Nadie más lo ve.</span></li>
+        <li><b>Dejás un mensaje</b><span>Quien recibe lo lee al abrir su regalo.</span></li>
+        <li><b>Pagás</b><span>Con los medios habituales, en una plataforma de pago reconocida.</span></li>
+        <li><b>Listo</b><span>Tu nombre aparece en el regalo, tu monto no.</span></li>
+      </ol>
+      <div class="demo-ctas">
+        <a class="btn btn-gold" href="{{ url_for('create_gift') }}">Armar un regalo real <svg><use href="#arrow"/></svg></a>
+        <a class="btn btn-line" href="{{ url_for('demo_gift') }}">Ver lo que ve quien recibe</a>
+      </div>
+    </div>
+
+    <div class="phone" aria-live="polite">
+      <div class="phone-in">
+        <div class="ph-top"><span>vaka.uy/g/sofia</span><svg><use href="#lock"/></svg></div>
+
+        <!-- 1: regalo -->
+        <div class="scr-v on" data-s="1">
+          <div class="g-cover"><svg><use href="#i-cake"/></svg></div>
+          <div class="g-body">
+            <small class="g-k">ORGANIZA MARTINA</small>
+            <h2>Cumpleaños de Sofía</h2>
+            <div class="g-prog"><div><b id="dTotal">$ 18.400</b><span>juntados</span></div><div class="g-bar"><i id="dBar" style="width:66%"></i></div></div>
+            <p class="g-meta"><span id="dCount">12</span> personas se sumaron · Cierra el viernes</p>
+            <div class="g-people" id="dPeople">
+              <span style="background:#D8B872">LC</span><span style="background:#C9D6C5">AP</span><span style="background:#E3C9A8">JM</span><span style="background:#D6CFE0">RV</span><span class="more">+8</span>
+            </div>
+            <button class="btn btn-gold wide" data-go="2">Sumarme al regalo</button>
+            <p class="g-lock"><svg><use href="#lock"/></svg>Los aportes son privados</p>
+          </div>
+        </div>
+
+        <!-- 2: monto -->
+        <div class="scr-v" data-s="2">
+          <button class="back" data-go="1" aria-label="Volver">←</button>
+          <h3>¿Cuánto querés aportar?</h3>
+          <p class="sub">Martina sugirió $ 500. Elegí el monto que prefieras.</p>
+          <div class="amts" id="amts">
+            <button data-v="500">$ 500</button><button data-v="800" class="on">$ 800</button><button data-v="1200">$ 1.200</button><button data-v="2000">$ 2.000</button>
+          </div>
+          <label class="fl">Tu nombre<input id="dName" value="Camila Torres"></label>
+          <p class="g-lock"><svg><use href="#lock"/></svg>Solo vos sabés cuánto aportaste</p>
+          <button class="btn btn-gold wide" data-go="3">Continuar</button>
+        </div>
+
+        <!-- 3: mensaje -->
+        <div class="scr-v" data-s="3">
+          <button class="back" data-go="2" aria-label="Volver">←</button>
+          <h3>Un mensaje para Sofía</h3>
+          <p class="sub">Lo va a leer cuando abra su regalo.</p>
+          <textarea id="dMsg" rows="4">¡Feliz cumple, Sofi! Que lo disfrutes muchísimo.</textarea>
+          <div class="emojis"><button>🎉</button><button>❤️</button><button>🥂</button><button>🎂</button></div>
+          <button class="btn btn-gold wide" data-go="4">Ir a pagar</button>
+        </div>
+
+        <!-- 4: pago -->
+        <div class="scr-v" data-s="4">
+          <button class="back" data-go="3" aria-label="Volver">←</button>
+          <h3>Pagar</h3>
+          <div class="sum"><span>Aporte al regalo de Sofía</span><b id="dAmt">$ 800</b></div>
+          <div class="paym">
+            <label class="on"><input type="radio" name="pm" checked> Tarjeta de crédito o débito</label>
+            <label><input type="radio" name="pm"> Otros medios de pago</label>
+          </div>
+          <div class="cardf"><span>•••• •••• •••• 4242</span><span>12/29</span></div>
+          <p class="g-lock"><svg><use href="#i-shield"/></svg>Pago procesado por una plataforma de pago reconocida</p>
+          <button class="btn btn-gold wide" id="dPay" data-go="5">Confirmar aporte</button>
+        </div>
+
+        <!-- 5: listo -->
+        <div class="scr-v" data-s="5">
+          <div class="done-ic"><svg><use href="#tick"/></svg></div>
+          <h3 style="text-align:center">¡Ya te sumaste!</h3>
+          <p class="sub" style="text-align:center">Tu mensaje quedó guardado para Sofía.</p>
+          <div class="ledger-mini" id="dLedger"></div>
+          <button class="btn btn-line wide" id="dRestart">Ver la demostración de nuevo</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function(){
+  var cur=1, amt=800, base=18400, goal=28000;
+  var steps=[].slice.call(document.querySelectorAll('#dsteps li'));
+  function fmt(n){return '$ '+n.toLocaleString('es-UY');}
+  function go(n){
+    document.querySelectorAll('.scr-v').forEach(function(s){s.classList.toggle('on', +s.dataset.s===n);});
+    steps.forEach(function(li,i){li.classList.toggle('on', i===n-1); li.classList.toggle('done', i<n-1);});
+    cur=n;
+    if(n===4) document.getElementById('dAmt').textContent=fmt(amt);
+    if(n===5) finish();
+  }
+  document.querySelectorAll('[data-go]').forEach(function(b){b.addEventListener('click',function(){go(+b.dataset.go);});});
+  document.querySelectorAll('#amts button').forEach(function(b){b.addEventListener('click',function(){
+    document.querySelectorAll('#amts button').forEach(function(x){x.classList.remove('on');}); b.classList.add('on'); amt=+b.dataset.v;});});
+  document.querySelectorAll('.emojis button').forEach(function(b){b.addEventListener('click',function(){var t=document.getElementById('dMsg'); t.value=t.value.trim()+' '+b.textContent;});});
+  function initials(n){return n.split(/\s+/).filter(Boolean).slice(0,2).map(function(w){return w[0].toUpperCase();}).join('')||'TU';}
+  function esc(s){var d=document.createElement('div'); d.textContent=s; return d.innerHTML;}
+  function finish(){
+    var name=document.getElementById('dName').value.trim()||'Vos', msg=document.getElementById('dMsg').value.trim();
+    var total=base+amt;
+    document.getElementById('dLedger').innerHTML=
+      '<div class="lm-row new"><span class="av" style="background:#B98D34;color:#0A131C">'+initials(name)+'</span><div><b>'+esc(name)+'</b><small>'+esc(msg).slice(0,60)+'</small></div><em>Se sumó</em></div>'+
+      '<div class="lm-row"><span class="av" style="background:#D8B872">LC</span><div><b>Lucas Correa</b><small>Hace 2 horas</small></div><em>Se sumó</em></div>'+
+      '<div class="lm-row"><span class="av" style="background:#C9D6C5">AP</span><div><b>Ana Pereira</b><small>Hace 5 horas</small></div><em>Se sumó</em></div>'+
+      '<div class="lm-foot"><span>13 personas · total</span><b>'+fmt(total)+'</b></div>';
+    document.getElementById('dTotal').textContent=fmt(total);
+    document.getElementById('dBar').style.width=Math.min(100,total/goal*100)+'%';
+    document.getElementById('dCount').textContent='13';
+    var p=document.getElementById('dPeople'); if(!p.querySelector('.me')){var s=document.createElement('span'); s.className='me'; s.style.background='#B98D34'; s.textContent=initials(name); p.insertBefore(s,p.firstChild);}
+  }
+  document.getElementById('dRestart').addEventListener('click',function(){
+    document.getElementById('dTotal').textContent=fmt(base); document.getElementById('dBar').style.width='66%'; document.getElementById('dCount').textContent='12';
+    var me=document.querySelector('#dPeople .me'); if(me) me.remove(); go(1);
+  });
+})();
+</script>
+{% endblock %}

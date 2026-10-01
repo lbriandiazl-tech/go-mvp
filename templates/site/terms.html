@@ -1,0 +1,51 @@
+{% extends 'site/base.html' %}
+{% block title %}Términos y condiciones — Vaka{% endblock %}
+{% block content %}
+<section class="phero">
+  <div class="wrap">
+    <span class="kicker">Legal</span>
+    <h1>Términos y condiciones</h1>
+    <p class="lead">Última actualización: octubre de 2026.</p>
+  </div>
+</section>
+<section>
+  <div class="wrap">
+    <div class="prose">
+      <h2>1. Sobre Vaka</h2>
+      <p>Vaka es una plataforma que permite a un grupo de personas reunir aportes para hacer un regalo en conjunto. Al usar el sitio vaka.uy aceptás estos términos.</p>
+
+      <h2>2. Quiénes participan</h2>
+      <ul>
+        <li><b>Quien organiza</b> crea el regalo, comparte el link y cierra la colecta.</li>
+        <li><b>Quien aporta</b> realiza un aporte voluntario y puede dejar un mensaje.</li>
+        <li><b>Quien recibe</b> abre el regalo y elige cómo utilizarlo entre las opciones disponibles.</li>
+      </ul>
+
+      <h2>3. Aportes y pagos</h2>
+      <p>Los aportes se procesan a través de proveedores de pago de terceros. Vaka no almacena los datos de tarjetas. Los aportes se reúnen en Vaka y se destinan al regalo elegido por quien recibe. Si corresponde algún costo de servicio, se informa antes de confirmar el pago.</p>
+      <p>Los aportes son voluntarios y, una vez confirmados, se consideran destinados al regalo. Las solicitudes de devolución se analizan caso a caso a través de <a href="mailto:{{ CONTACT_EMAIL }}">{{ CONTACT_EMAIL }}</a>.</p>
+
+      <h2>4. El regalo</h2>
+      <p>Quien recibe puede elegir entre gift cards, experiencias u otras opciones ofrecidas por comercios adheridos. Cada opción está sujeta a las condiciones de uso del comercio que la ofrece (vigencia, disponibilidad y forma de canje), que se informan al momento de elegir.</p>
+
+      <h2>5. Uso adecuado</h2>
+      <p>No está permitido usar Vaka para fines distintos a reunir aportes para un regalo, ni con fines ilícitos. Vaka puede suspender un regalo si detecta un uso indebido.</p>
+
+      <h2>6. Privacidad</h2>
+      <p>El tratamiento de los datos personales se rige por nuestra <a href="{{ url_for('page_privacy') }}">Política de privacidad</a>.</p>
+
+      <h2>7. Responsabilidad</h2>
+      <p>Vaka no es responsable por los productos o servicios brindados por los comercios adheridos, sin perjuicio de acompañar a quien recibe ante cualquier inconveniente con el canje.</p>
+
+      <h2>8. Cambios</h2>
+      <p>Podemos actualizar estos términos. La versión vigente es siempre la publicada en esta página.</p>
+
+      <h2>9. Ley aplicable</h2>
+      <p>Estos términos se rigen por las leyes de la República Oriental del Uruguay.</p>
+
+      <h2>10. Contacto</h2>
+      <p>Por cualquier consulta escribinos a <a href="mailto:{{ CONTACT_EMAIL }}">{{ CONTACT_EMAIL }}</a>.</p>
+    </div>
+  </div>
+</section>
+{% endblock %}

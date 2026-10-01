@@ -1,0 +1,50 @@
+{% extends 'site/base.html' %}
+{% import 'site/_macros.html' as m with context %}
+{% block title %}Comercios — Vaka{% endblock %}
+{% block description %}Sumá tu marca a Vaka y llegá a quienes reciben regalos en grupo.{% endblock %}
+{% block content %}
+
+<section class="phero dark">
+  <div class="wrap">
+    <span class="kicker">Para comercios</span>
+    <h1>Tu marca, <em>dentro del regalo.</em></h1>
+    <p class="lead">Cada regalo en Vaka termina en una elección. Sumá tus gift cards o experiencias y llegá a personas que ya tienen un saldo para disfrutar.</p>
+    <div class="ctas"><a class="btn btn-gold" href="#sumarme">Quiero formar parte <svg><use href="#arrow"/></svg></a></div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="sec-head reveal"><div><span class="kicker">Por qué sumarse</span><h2>Clientes nuevos, <em>con el regalo ya pago.</em></h2></div></div>
+    <div class="grid3">
+      <div class="card reveal"><div class="ico"><svg><use href="#i-store"/></svg></div><h3>Visibilidad en el momento justo</h3><p>Tu marca aparece cuando quien recibe está eligiendo en qué usar su regalo.</p></div>
+      <div class="card reveal"><div class="ico"><svg><use href="#i-card"/></svg></div><h3>Ventas cobradas por adelantado</h3><p>El regalo ya fue reunido por el grupo. Quien lo elige llega con el saldo disponible.</p></div>
+      <div class="card reveal"><div class="ico"><svg><use href="#i-users"/></svg></div><h3>Nuevos clientes</h3><p>Muchas personas conocen un comercio por primera vez gracias a un regalo.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="how">
+  <div class="wrap">
+    <div class="sec-head reveal"><div><span class="kicker">Cómo funciona</span><h2>Simple para <em>tu equipo.</em></h2></div></div>
+    <div class="uses-grid">
+      <div class="use reveal"><span class="n">01</span><div><b>Nos contactás</b><p>Nos contás qué ofrecés: gift cards, experiencias o productos.</p></div></div>
+      <div class="use reveal"><span class="n">02</span><div><b>Definimos la propuesta</b><p>Acordamos montos, condiciones de uso y cómo se canjea.</p></div></div>
+      <div class="use reveal"><span class="n">03</span><div><b>Tu marca en Vaka</b><p>Aparecés en el catálogo que ve cada persona al abrir su regalo.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section id="sumarme">
+  <div class="wrap demo-grid">
+    <div class="reveal">
+      <span class="kicker">Sumar mi comercio</span>
+      <h2 style="margin-top:18px">Conversemos.</h2>
+      <p class="lead" style="margin-top:20px">Completá el formulario y te contactamos para conocer tu propuesta.</p>
+    </div>
+    <div class="card form-card reveal">
+      {{ m.contact_form(url_for('page_merchants') ~ '#sumarme', sent, error, company=True, cta='Enviar', placeholder='¿Qué rubro tenés y qué te gustaría ofrecer en Vaka?') }}
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -70,6 +70,13 @@
     if (occasionSelect.value === '__other__') occasionCustom.focus();
   });
   occasionCustom.addEventListener('input', syncOccasion);
+  (function(){
+    const pre = new URLSearchParams(location.search).get('ocasion');
+    if (!pre) return;
+    const opt = Array.from(occasionSelect.options).find(o => o.value === pre);
+    if (opt) { occasionSelect.value = pre; }
+    else { occasionSelect.value = '__other__'; occasionCustom.value = pre; }
+  })();
   syncOccasion();
 
   document.querySelector('form').addEventListener('submit', (e) => {

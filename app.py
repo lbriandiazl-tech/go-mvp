@@ -72,7 +72,95 @@ with app.app_context():
 
 @app.route("/", methods=["GET"])
 def home():
-    return render_template("home.html")
+    return render_template("site/home.html")
+
+
+# ---------------------------------------------------------------
+# Sitio institucional
+# ---------------------------------------------------------------
+
+CONTACT_EMAIL = os.environ.get("CONTACT_EMAIL", "hola@vaka.uy")
+app.jinja_env.globals["CONTACT_EMAIL"] = CONTACT_EMAIL
+
+
+@app.route("/como-funciona")
+def page_how():
+    return render_template("site/how.html")
+
+
+@app.route("/demo/grupo")
+def demo_group():
+    return render_template("site/demo_group.html")
+
+
+@app.route("/demo/regalo")
+def demo_gift():
+    return render_template("site/demo_gift.html")
+
+
+@app.route("/ocasiones")
+def page_occasions():
+    return render_template("site/occasions.html")
+
+
+@app.route("/empresas", methods=["GET", "POST"])
+def page_business():
+    sent, error = handle_contact_form("Empresas")
+    return render_template("site/business.html", sent=sent, error=error)
+
+
+@app.route("/comercios", methods=["GET", "POST"])
+def page_merchants():
+    sent, error = handle_contact_form("Comercios")
+    return render_template("site/merchants.html", sent=sent, error=error)
+
+
+@app.route("/nosotros")
+def page_about():
+    return render_template("site/about.html")
+
+
+@app.route("/terminos")
+def page_terms():
+    return render_template("site/terms.html")
+
+
+@app.route("/privacidad")
+def page_privacy():
+    return render_template("site/privacy.html")
+
+
+def handle_contact_form(default_topic):
+    """Procesa los formularios de contacto del sitio (ayuda, empresas,
+    comercios) y los reenvía por mail a CONTACT_EMAIL vía Resend."""
+    if request.method != "POST":
+        return False, None
+    if request.form.get("website"):  # honeypot anti-spam
+        return True, None
+    name = request.form.get("name", "").strip()[:120]
+    email = request.form.get("email", "").strip()[:200]
+    company = request.form.get("company", "").strip()[:160]
+    topic = (request.form.get("topic", "").strip() or default_topic)[:60]
+    message = request.form.get("message", "").strip()[:4000]
+    if not (name and "@" in email and message):
+        return False, "Completá tu nombre, tu email y el mensaje."
+    if not resend_client.is_configured():
+        return False, f"El formulario no está disponible en este momento. Escribinos a {CONTACT_EMAIL}."
+    from html import escape
+    html = (f"<p><b>{escape(name)}</b> &lt;{escape(email)}&gt;</p>"
+            + (f"<p>Empresa: {escape(company)}</p>" if company else "")
+            + f"<p>Tema: {escape(topic)}</p><p>{escape(message).replace(chr(10), '<br>')}</p>")
+    try:
+        resend_client.send_email(CONTACT_EMAIL, f"[Web · {topic}] {name}", html, reply_to=email)
+    except resend_client.ResendError:
+        return False, f"No pudimos enviar el mensaje. Escribinos a {CONTACT_EMAIL}."
+    return True, None
+
+
+@app.route("/ayuda", methods=["GET", "POST"])
+def page_help():
+    sent, error = handle_contact_form("Consulta")
+    return render_template("site/help.html", sent=sent, error=error)
 
 
 @app.route("/crear", methods=["GET", "POST"])
