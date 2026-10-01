@@ -43,13 +43,7 @@
         <p class="gd-to">Tu saldo: $ 24.600</p>
         <h2>¿Cómo querés disfrutarlo?</h2>
         <div class="gd-cats" id="gdCats">
-          {% for ic, t, d in [
-            ('i-suitcase','Escapadas','Hoteles y estadías'),('i-plane','Viajes','Pasajes y paquetes'),('i-dine','Gastronomía','Restaurantes'),
-            ('i-spa','Bienestar','Spa y masajes'),('i-shirt','Moda','Ropa y accesorios'),('i-bike','Deporte','Equipamiento'),
-            ('i-ticket','Espectáculos','Teatro y shows'),('i-cart','Supermercado','Compras del hogar'),('i-book','Libros','Librerías')
-          ] %}
-          <button data-t="{{ t }}"><svg><use href="#{{ ic }}"/></svg><b>{{ t }}</b><span>{{ d }}</span></button>
-          {% endfor %}
+          {% for c in categories %}<button data-t="{{ c.name }}"><svg><use href="#{{ c.icon }}"/></svg><b>{{ c.name }}</b><span>{{ c.tagline }}</span></button>{% endfor %}
         </div>
       </div>
 
@@ -57,7 +51,7 @@
       <div class="gd-s" data-s="4">
         <div class="done-ic"><svg><use href="#tick"/></svg></div>
         <h2>¡Elegiste <em id="gdChoice">Escapadas</em>!</h2>
-        <p class="lead" style="margin:14px auto 28px">Te enviamos por email los detalles para usar tu regalo.</p>
+        <p class="lead" style="margin:14px auto 28px">En un regalo real, acá elegís la opción que más te gusta y te escribimos para coordinar la entrega.</p>
         <div class="gd-end">
           <button class="btn btn-line" id="gdAgain">Ver de nuevo</button>
           <a class="btn btn-gold" href="{{ url_for('create_gift') }}">Armar un regalo real <svg><use href="#arrow"/></svg></a>

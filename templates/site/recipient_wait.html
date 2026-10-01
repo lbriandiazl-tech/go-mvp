@@ -1,0 +1,12 @@
+{% extends 'site/base.html' %}
+{% block title %}Tu regalo está en camino — Vaka{% endblock %}
+{% block head %}<meta name="robots" content="noindex">{% endblock %}
+{% block content %}
+<section class="dark rx">
+  <div class="rx-s on">
+    <span class="rx-ico"><svg><use href="#box"/></svg></span>
+    <h1>Tu regalo está <em>en camino.</em></h1>
+    <p class="lead">Todavía se están sumando aportes para {{ event_title(gift) }}. Cuando esté listo, vas a poder abrirlo acá mismo.</p>
+  </div>
+</section>
+{% endblock %}

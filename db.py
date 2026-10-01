@@ -64,7 +64,9 @@ CREATE TABLE IF NOT EXISTS contributions (
     mp_preference_id TEXT,
     mp_payment_id TEXT,
     created_at TEXT NOT NULL,
-    confirmed_at TEXT
+    confirmed_at TEXT,
+    contributor_email TEXT NOT NULL DEFAULT '',
+    message TEXT NOT NULL DEFAULT ''
 );
 """
 
@@ -99,6 +101,10 @@ def _migrate():
         ("contributions", "payment_method", "TEXT NOT NULL DEFAULT 'transfer'"),
         ("contributions", "mp_preference_id", "TEXT"),
         ("contributions", "mp_payment_id", "TEXT"),
+        ("contributions", "contributor_email", "TEXT NOT NULL DEFAULT ''"),
+        ("contributions", "message", "TEXT NOT NULL DEFAULT ''"),
+        ("gifts", "recipient_email", "TEXT NOT NULL DEFAULT ''"),
+        ("gifts", "closes_on", "TEXT NOT NULL DEFAULT ''"),
     ]
     for table, column, coltype in additions:
         try:
@@ -144,7 +150,7 @@ def _now():
 
 # ---------- regalos ----------
 
-def create_gift(recipient_name, occasion, organizer_name, organizer_email, min_contribution, bank_details="", currency="UYU"):
+def create_gift(recipient_name, occasion, organizer_name, organizer_email, min_contribution, bank_details="", currency="UYU", closes_on=""):
     # bank_details queda en la tabla solo por compatibilidad con regalos
     # viejos: con el modelo de custodia la cuenta es siempre la de Vaka
     # (variable de entorno VAKA_BANK_DETAILS), no la del organizador.
@@ -154,14 +160,14 @@ def create_gift(recipient_name, occasion, organizer_name, organizer_email, min_c
         conn.execute(
             text("""INSERT INTO gifts
                    (slug, organizer_token, recipient_name, occasion, organizer_name, organizer_email,
-                    min_contribution, bank_details, currency, status, created_at)
+                    min_contribution, bank_details, currency, status, created_at, closes_on)
                    VALUES (:slug, :token, :recipient_name, :occasion, :organizer_name, :organizer_email,
-                           :min_contribution, :bank_details, :currency, 'open', :created_at)"""),
+                           :min_contribution, :bank_details, :currency, 'open', :created_at, :closes_on)"""),
             dict(slug=slug, token=token, recipient_name=recipient_name, occasion=occasion,
                  organizer_name=organizer_name, organizer_email=organizer_email,
                  min_contribution=min_contribution,
                  bank_details=bank_details, currency=currency,
-                 created_at=_now()),
+                 created_at=_now(), closes_on=closes_on),
         )
     return slug, token
 
@@ -191,17 +197,19 @@ def close_gift(gift_id):
 
 # ---------- aportes ----------
 
-def create_contribution(gift_id, contributor_name, amount, payment_method="transfer"):
+def create_contribution(gift_id, contributor_name, amount, payment_method="transfer",
+                        contributor_email="", message=""):
     ref = new_reference_code()
     with engine.begin() as conn:
         conn.execute(
             text("""INSERT INTO contributions
                    (gift_id, contributor_name, amount, reference_code, status,
-                    payment_method, created_at)
+                    payment_method, created_at, contributor_email, message)
                    VALUES (:gift_id, :contributor_name, :amount, :ref, 'pending',
-                           :payment_method, :created_at)"""),
+                           :payment_method, :created_at, :email, :message)"""),
             dict(gift_id=gift_id, contributor_name=contributor_name, amount=amount,
-                 ref=ref, payment_method=payment_method, created_at=_now()),
+                 ref=ref, payment_method=payment_method, created_at=_now(),
+                 email=contributor_email, message=message),
         )
     return ref
 
@@ -282,13 +290,25 @@ def confirm_contribution_by_mp(reference_code, mp_payment_id):
         )
 
 
-def set_selected_item(gift_id, category, item_title):
+def set_selected_item(gift_id, category, item_title, recipient_email=""):
     with engine.begin() as conn:
         conn.execute(
             text("""UPDATE gifts SET selected_category = :cat, selected_item = :item,
-                   selected_at = :now WHERE id = :id"""),
-            dict(cat=category, item=item_title, now=_now(), id=gift_id),
+                   selected_at = :now, recipient_email = :email WHERE id = :id"""),
+            dict(cat=category, item=item_title, now=_now(), id=gift_id, email=recipient_email),
         )
+
+
+def confirmed_messages(gift_id):
+    """Mensajes que dejaron quienes aportaron (solo aportes confirmados)."""
+    with engine.connect() as conn:
+        result = conn.execute(
+            text("""SELECT contributor_name, message FROM contributions
+                   WHERE gift_id = :gift_id AND status = 'confirmed' AND message <> ''
+                   ORDER BY confirmed_at"""),
+            dict(gift_id=gift_id),
+        )
+        return _rows(result)
 
 
 def suggested_amounts(min_contribution):
@@ -326,6 +346,18 @@ def list_pending_transfers():
                    g.slug, g.recipient_name, g.occasion, g.status AS gift_status
             FROM contributions c JOIN gifts g ON g.id = c.gift_id
             WHERE c.status = 'pending' AND c.payment_method = 'transfer'
+            ORDER BY c.created_at ASC"""))
+        return _rows(result)
+
+
+def list_pledges():
+    """Aportes registrados sin pago (cuando todavía no hay procesador)."""
+    with engine.connect() as conn:
+        result = conn.execute(text("""
+            SELECT c.id, c.contributor_name, c.contributor_email, c.amount, c.message, c.created_at,
+                   g.slug, g.recipient_name, g.occasion
+            FROM contributions c JOIN gifts g ON g.id = c.gift_id
+            WHERE c.status = 'pending' AND c.payment_method = 'pledge'
             ORDER BY c.created_at ASC"""))
         return _rows(result)
 

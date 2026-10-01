@@ -23,7 +23,7 @@
       <div class="card stat">
         <small>Total reunido</small>
         <b>${{ total|money }}</b>
-        <span>{{ contributions|selectattr('status','equalto','confirmed')|list|length }} aportes confirmados · sugerido ${{ gift.min_contribution|money }}</span>
+        <span>{{ contributions|selectattr('status','equalto','confirmed')|list|length }} aportes confirmados · sugerido ${{ gift.min_contribution|money }}{% if gift.closes_on|fecha %} · cierra el {{ gift.closes_on|fecha }}{% endif %}</span>
       </div>
 
       <div class="card share">

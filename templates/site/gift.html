@@ -1,0 +1,27 @@
+{% extends 'site/base.html' %}
+{% block title %}{{ event_title(gift) }} — Vaka{% endblock %}
+{% block description %}Organiza {{ gift.organizer_name }}. Sumate al regalo para {{ gift.recipient_name }}.{% endblock %}
+{% block head %}<meta name="robots" content="noindex">{% endblock %}
+{% block content %}
+<section class="app">
+  <div class="wrap app-narrow">
+    <div class="card gift-card">
+      <div class="gift-cover"><svg><use href="#box"/></svg></div>
+      <div class="gift-body">
+        <span class="kicker">Organiza {{ gift.organizer_name }}</span>
+        <h1>{{ event_title(gift) }}</h1>
+        <div class="gift-total"><b>${{ total|money }}</b><span>reunidos{% if people %} · {{ people|length }} {{ 'persona' if people|length == 1 else 'personas' }}{% endif %}</span></div>
+        {% if people %}<div class="g-people">{% for n in people[:5] %}<span style="background:{{ ['#D8B872','#C9D6C5','#E3C9A8','#D6CFE0','#C9D6E3'][loop.index0] }}">{{ n[:1]|upper }}</span>{% endfor %}{% if people|length > 5 %}<span class="more">+{{ people|length - 5 }}</span>{% endif %}</div>{% endif %}
+        {% if gift.status == 'open' %}
+          <a class="btn btn-gold wide" href="{{ url_for('contribute', slug=gift.slug) }}">Sumarme al regalo <svg><use href="#arrow"/></svg></a>
+          <p class="hint center-t"><svg class="i"><use href="#lock"/></svg> Tu aporte es privado · Aporte sugerido ${{ gift.min_contribution|money }}</p>
+          {% if gift.closes_on|fecha %}<p class="gift-close">Cierra el {{ gift.closes_on|fecha }}</p>{% endif %}
+        {% else %}
+          <div class="form-err" style="background:var(--cream);color:var(--ink-2)">Este regalo ya se cerró. ¡Gracias a todos los que participaron!</div>
+        {% endif %}
+      </div>
+    </div>
+    <p class="hint center-t" style="margin-top:22px">¿Querés organizar un regalo así? <a href="{{ url_for('home') }}">Conocé Vaka</a></p>
+  </div>
+</section>
+{% endblock %}

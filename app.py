@@ -104,6 +104,22 @@ app.jinja_env.globals["transfer_enabled"] = transfer_enabled
 app.jinja_env.filters["money"] = fmt_money
 app.jinja_env.filters["fdate"] = fmt_date
 
+_DIAS = ["lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo"]
+_MESES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto",
+          "setiembre", "octubre", "noviembre", "diciembre"]
+
+
+def fmt_long_date(iso):
+    """'2026-10-09' -> 'viernes 9 de octubre'."""
+    try:
+        d = datetime.strptime((iso or "")[:10], "%Y-%m-%d")
+    except ValueError:
+        return ""
+    return f"{_DIAS[d.weekday()]} {d.day} de {_MESES[d.month - 1]}"
+
+
+app.jinja_env.filters["fecha"] = fmt_long_date
+
 with app.app_context():
     db.init_db()
 
@@ -137,7 +153,7 @@ def demo_group():
 
 @app.route("/demo/regalo")
 def demo_gift():
-    return render_template("site/demo_gift.html")
+    return render_template("site/demo_gift.html", categories=catalog.categories())
 
 
 @app.route("/ocasiones")
@@ -244,6 +260,10 @@ def create_gift():
         except (ValueError, KeyError):
             min_contribution = 0
 
+        closes_on = request.form.get("closes_on", "").strip()[:10]
+        if closes_on and not fmt_long_date(closes_on):
+            closes_on = ""
+
         if not (recipient_name and occasion and organizer_name and organizer_email
                 and min_contribution > 0):
             flash("Completá todos los campos, incluido tu mail.")
@@ -251,7 +271,7 @@ def create_gift():
 
         slug, token = db.create_gift(
             recipient_name, occasion, organizer_name, organizer_email,
-            min_contribution,
+            min_contribution, closes_on=closes_on,
         )
         remember_gift(slug)
 
@@ -337,7 +357,8 @@ def public_gift(slug):
     if not gift:
         abort(404)
     total = db.confirmed_total(gift["id"])
-    return render_template("public_gift.html", gift=gift, total=total)
+    people = db.confirmed_contributors(gift["id"])
+    return render_template("site/gift.html", gift=gift, total=total, people=people)
 
 
 @app.route("/g/<slug>/aportar", methods=["GET", "POST"])
@@ -346,17 +367,21 @@ def contribute(slug):
     if not gift:
         abort(404)
     if gift["status"] != "open":
-        return render_template("closed.html", gift=gift)
+        return render_template("site/gift.html", gift=gift, total=db.confirmed_total(gift["id"]), people=db.confirmed_contributors(gift["id"]))
 
     suggested = db.suggested_amounts(gift["min_contribution"])
     mp_enabled = mercadopago_client.is_configured()
 
+    pay_enabled = mp_enabled or transfer_enabled()
+
     def form(**extra):
-        return render_template("contribute.html", gift=gift, mp_enabled=mp_enabled,
-                               suggested=suggested, **extra)
+        return render_template("site/contribute.html", gift=gift, mp_enabled=mp_enabled,
+                               pay_enabled=pay_enabled, suggested=suggested, **extra)
 
     if request.method == "POST":
-        contributor_name = request.form["contributor_name"].strip()
+        contributor_name = request.form.get("contributor_name", "").strip()[:80]
+        contributor_email = request.form.get("contributor_email", "").strip().lower()[:200]
+        message = request.form.get("message", "").strip()[:500]
         try:
             amount = int(request.form["amount"])
         except (ValueError, KeyError):
@@ -367,8 +392,20 @@ def contribute(slug):
             flash("Ingresá tu nombre y un monto válido.")
             return form()
 
+        if not pay_enabled:
+            # Sin procesador de pagos activo: se registra el aporte y se
+            # completa el pago más adelante con el link que enviamos por mail.
+            if "@" not in contributor_email:
+                flash("Ingresá tu email para enviarte el link de pago.")
+                return form()
+            db.create_contribution(gift["id"], contributor_name, amount, payment_method="pledge",
+                                   contributor_email=contributor_email, message=message)
+            return render_template("site/contribute_done.html", gift=gift, amount=amount,
+                                   name=contributor_name, email=contributor_email)
+
         if payment_method == "mercadopago" and mp_enabled:
-            ref = db.create_contribution(gift["id"], contributor_name, amount, payment_method="mercadopago")
+            ref = db.create_contribution(gift["id"], contributor_name, amount, payment_method="mercadopago",
+                                         contributor_email=contributor_email, message=message)
             contribution = db.get_contribution_by_reference(ref)
             try:
                 pref_id, init_point = mercadopago_client.create_preference(
@@ -389,11 +426,8 @@ def contribute(slug):
                     flash(f"No se pudo iniciar el pago con Mercado Pago ({e}). Probá de nuevo en unos minutos.")
                 return form()
 
-        if not transfer_enabled():
-            flash("Por ahora no hay un medio de pago disponible. Probá de nuevo más tarde.")
-            return form()
-
-        ref = db.create_contribution(gift["id"], contributor_name, amount, payment_method="transfer")
+        ref = db.create_contribution(gift["id"], contributor_name, amount, payment_method="transfer",
+                                     contributor_email=contributor_email, message=message)
         return render_template("contribute_instructions.html", gift=gift, amount=amount, ref=ref,
                                bank_details=vaka_bank_details())
 
@@ -506,6 +540,7 @@ def admin_panel():
         "admin.html",
         token=token,
         pending=db.list_pending_transfers(),
+        pledges=db.list_pledges(),
         to_deliver=[g for g in gifts if g["status"] == "closed" and not g["delivered_at"]],
         gifts=gifts,
         stats=db.admin_stats(),
@@ -547,14 +582,18 @@ def recipient_experience(slug):
     if not gift:
         abort(404)
     if gift["status"] != "closed":
-        return render_template("not_ready.html", gift=gift)
+        return render_template("site/recipient_wait.html", gift=gift)
+    if gift["selected_item"]:
+        item = catalog.get_item(gift["selected_category"], gift["selected_item"]) or \
+            dict(title=gift["selected_item"], description="")
+        return render_template("site/recipient_done.html", gift=gift, item=item,
+                               categoria=gift["selected_category"])
 
     contributors = db.confirmed_contributors(gift["id"])
-    total = db.confirmed_total(gift["id"])
-    contributors_line = format_contributors(contributors)
     return render_template(
-        "recipient_experience.html",
-        gift=gift, contributors_line=contributors_line, total=total,
+        "site/recipient.html",
+        gift=gift, contributors=contributors, total=db.confirmed_total(gift["id"]),
+        messages=db.confirmed_messages(gift["id"]), categories=catalog.categories(),
     )
 
 
@@ -576,24 +615,41 @@ def catalog_view(slug):
     if not gift:
         abort(404)
     if gift["status"] != "closed":
-        return render_template("not_ready.html", gift=gift)
+        return render_template("site/recipient_wait.html", gift=gift)
     categoria = request.args.get("categoria", "")
     items = catalog.get_category(categoria)
-    return render_template("catalog.html", gift=gift, categoria=categoria, items=items)
+    if not items:
+        return redirect(url_for("recipient_experience", slug=slug))
+    return render_template("site/recipient_catalog.html", gift=gift, categoria=categoria, items=items,
+                           meta=catalog.category_meta(categoria), total=db.confirmed_total(gift["id"]))
 
 
 @app.route("/regalo/<slug>/elegir", methods=["POST"])
 def catalog_select(slug):
     gift = db.get_gift_by_slug(slug)
-    if not gift:
+    if not gift or gift["status"] != "closed":
         abort(404)
-    categoria = request.form["categoria"]
-    item_title = request.form["item_title"]
+    categoria = request.form.get("categoria", "")
+    item_title = request.form.get("item_title", "")
+    email = request.form.get("recipient_email", "").strip().lower()[:200]
     item = catalog.get_item(categoria, item_title)
     if not item:
         abort(404)
-    db.set_selected_item(gift["id"], categoria, item_title)
-    return render_template("catalog_confirmed.html", gift=gift, categoria=categoria, item=item)
+    if "@" not in email:
+        flash("Ingresá tu email para coordinar la entrega.")
+        return redirect(url_for("catalog_view", slug=slug, categoria=categoria))
+    db.set_selected_item(gift["id"], categoria, item_title, recipient_email=email)
+    if resend_client.is_configured():
+        try:
+            resend_client.send_gift_chosen_emails(
+                vaka_email=CONTACT_EMAIL, organizer_email=gift["organizer_email"],
+                organizer_name=gift["organizer_name"], recipient_name=gift["recipient_name"],
+                recipient_email=email, gift_title=event_title(gift),
+                category=categoria, item_title=item_title, total=fmt_money(db.confirmed_total(gift["id"])))
+        except resend_client.ResendError:
+            pass
+    return render_template("site/recipient_done.html", gift=db.get_gift_by_slug(slug), item=item,
+                           categoria=categoria)
 
 
 if __name__ == "__main__":

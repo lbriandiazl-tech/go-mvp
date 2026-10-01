@@ -139,3 +139,27 @@ def send_login_email(to_email, login_url):
         </p>
     """)
     return send_email(to_email, subject, html)
+
+
+def send_gift_chosen_emails(vaka_email, organizer_email, organizer_name, recipient_name, recipient_email,
+                            gift_title, category, item_title, total):
+    """Avisa a Vaka (para coordinar la entrega) y a quien organizó."""
+    first = (organizer_name or "").split(" ")[0]
+    internal = _email_wrapper(f"""
+        <h1 style="color:#F4EFE4; font-size:20px; margin:0 0 12px;">Regalo elegido — {gift_title}</h1>
+        <p style="color:rgba(244,239,228,0.78); font-size:14.5px; line-height:1.7; margin:0;">
+          <b style="color:#F4EFE4;">{recipient_name}</b> eligió <b style="color:#F4EFE4;">{item_title}</b> ({category}).<br>
+          Total del regalo: ${total}<br>Contacto de quien recibe: {recipient_email}<br>
+          Organiza: {organizer_name} ({organizer_email})
+        </p>
+    """)
+    send_email(vaka_email, f"[Vaka] Regalo elegido — {gift_title}", internal, reply_to=recipient_email)
+    if organizer_email:
+        html = _email_wrapper(f"""
+            <h1 style="color:#F4EFE4; font-size:22px; margin:0 0 12px;">{recipient_name} ya eligió su regalo</h1>
+            <p style="color:rgba(244,239,228,0.78); font-size:14.5px; line-height:1.6; margin:0;">
+              Hola {first}: {recipient_name} abrió el regalo de <b style="color:#F4EFE4;">{gift_title}</b> y eligió
+              <b style="color:#F4EFE4;">{item_title}</b>. Nos encargamos de coordinar la entrega.
+            </p>
+        """)
+        send_email(organizer_email, f"{recipient_name} ya eligió su regalo", html)

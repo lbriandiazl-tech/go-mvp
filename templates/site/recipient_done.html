@@ -1,0 +1,14 @@
+{% extends 'site/base.html' %}
+{% block title %}¡Elegiste tu regalo! — Vaka{% endblock %}
+{% block head %}<meta name="robots" content="noindex">{% endblock %}
+{% block content %}
+<section class="dark rx">
+  <div class="rx-s on">
+    <div class="done-ic"><svg><use href="#tick"/></svg></div>
+    <p class="gd-to">{{ event_title(gift) }}</p>
+    <h1>¡Elegiste <em>tu regalo!</em></h1>
+    <div class="rx-picked"><small>{{ categoria }}</small><b>{{ item.title }}</b>{% if item.description %}<span>{{ item.description }}</span>{% endif %}</div>
+    <p class="lead">{% if gift.recipient_email %}Te vamos a escribir a <b>{{ gift.recipient_email }}</b> para coordinar la entrega.{% else %}Nos pondremos en contacto para coordinar la entrega.{% endif %}</p>
+  </div>
+</section>
+{% endblock %}

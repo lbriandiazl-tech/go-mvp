@@ -1,0 +1,31 @@
+{% extends 'site/base.html' %}
+{% block title %}{{ categoria }} — Vaka{% endblock %}
+{% block head %}<meta name="robots" content="noindex">{% endblock %}
+{% block content %}
+<section class="dark rx rx-cat">
+  <div class="rx-in">
+    <a class="rx-back" href="{{ url_for('recipient_experience', slug=gift.slug) }}#3">← Todas las categorías</a>
+    <span class="rx-ico"><svg><use href="#{{ meta.icon }}"/></svg></span>
+    <h1>{{ categoria }}</h1>
+    <p class="lead">Elegí lo que más te guste, {{ gift.recipient_name.split(' ')[0] }}. Tu regalo es de <b>${{ total|money }}</b>.</p>
+    {% with messages = get_flashed_messages() %}{% if messages %}{% for m in messages %}<div class="form-err">{{ m }}</div>{% endfor %}{% endif %}{% endwith %}
+    <form method="POST" action="{{ url_for('catalog_select', slug=gift.slug) }}" class="rx-form">
+      <input type="hidden" name="categoria" value="{{ categoria }}">
+      <div class="rx-items">
+        {% for item in items %}
+        <label class="rx-item"><input type="radio" name="item_title" value="{{ item.title }}" required{% if loop.first and items|length == 1 %} checked{% endif %}>
+          <span class="rx-item-in"><b>{{ item.title }}</b><span>{{ item.description }}</span>{% if item.price_from %}<em>Desde ${{ item.price_from|money }}</em>{% endif %}</span>
+          <i class="rx-check"><svg><use href="#tick"/></svg></i>
+        </label>
+        {% endfor %}
+      </div>
+      <div class="rx-confirm">
+        <label for="recipient_email">Tu email</label>
+        <input type="email" id="recipient_email" name="recipient_email" autocomplete="email" placeholder="tu@email.com" required>
+        <small>Te escribimos a este email para coordinar la entrega de tu regalo.</small>
+        <button class="btn btn-gold" type="submit">Confirmar mi elección <svg><use href="#arrow"/></svg></button>
+      </div>
+    </form>
+  </div>
+</section>
+{% endblock %}

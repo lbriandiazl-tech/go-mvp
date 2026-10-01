@@ -1,0 +1,51 @@
+{% extends 'site/base.html' %}
+{% block title %}Sumá tu aporte — {{ event_title(gift) }}{% endblock %}
+{% block head %}<meta name="robots" content="noindex">{% endblock %}
+{% block content %}
+<section class="app">
+  <div class="wrap app-narrow">
+    <a class="crumb" href="{{ url_for('public_gift', slug=gift.slug) }}">← {{ event_title(gift) }}</a>
+    <div class="card app-card" style="margin-top:12px">
+      <h1>Sumá tu aporte</h1>
+      <p class="hint" style="margin-bottom:22px"><svg class="i"><use href="#lock"/></svg> Tu aporte es privado: los demás solo ven que te sumaste.</p>
+      {% with messages = get_flashed_messages() %}{% if messages %}{% for m in messages %}<div class="form-err">{{ m }}</div>{% endfor %}{% endif %}{% endwith %}
+      <form method="POST" class="form" id="contributeForm">
+        <div><label for="contributor_name">Tu nombre</label><input id="contributor_name" name="contributor_name" autocomplete="name" placeholder="Ej.: Lucas" required value="{{ request.form.get('contributor_name','') }}"></div>
+        <div><label>¿Cuánto querés aportar?</label>
+          <input type="hidden" id="amount" name="amount" value="">
+          <div class="amts">{% for amt in suggested %}<button type="button" data-v="{{ amt }}">${{ amt|money }}</button>{% endfor %}</div>
+          <button type="button" class="other" id="otherToggle">Otro monto</button>
+          <input type="number" id="customAmount" placeholder="Escribí el monto" min="1" style="display:none;margin-top:10px">
+        </div>
+        <div><label for="message">Mensaje para {{ gift.recipient_name }} <span class="opt">(opcional)</span></label><textarea id="message" name="message" rows="3" placeholder="¡Feliz cumple!">{{ request.form.get('message','') }}</textarea></div>
+        {% if not pay_enabled %}
+        <div><label for="contributor_email">Tu email</label><input type="email" id="contributor_email" name="contributor_email" autocomplete="email" placeholder="tu@email.com" required value="{{ request.form.get('contributor_email','') }}">
+          <small class="hint">Te enviamos a este email el link para completar el pago.</small></div>
+        <button class="btn btn-gold" type="submit">Confirmar mi aporte <svg><use href="#arrow"/></svg></button>
+        {% else %}
+        <div><label for="contributor_email">Tu email <span class="opt">(opcional)</span></label><input type="email" id="contributor_email" name="contributor_email" autocomplete="email" placeholder="tu@email.com"></div>
+        {% if mp_enabled and transfer_enabled() %}
+        <div><label>Medio de pago</label>
+          <div class="paym"><label class="on"><input type="radio" name="payment_method" value="mercadopago" checked> Tarjeta</label><label><input type="radio" name="payment_method" value="transfer"> Transferencia bancaria</label></div></div>
+        {% elif mp_enabled %}<input type="hidden" name="payment_method" value="mercadopago">
+        {% else %}<input type="hidden" name="payment_method" value="transfer">{% endif %}
+        <button class="btn btn-gold" type="submit">Continuar al pago <svg><use href="#arrow"/></svg></button>
+        {% endif %}
+      </form>
+    </div>
+  </div>
+</section>
+{% endblock %}
+{% block scripts %}
+<script>
+(function(){
+  var amt=document.getElementById('amount'), btns=[].slice.call(document.querySelectorAll('.amts button')), other=document.getElementById('otherToggle'), custom=document.getElementById('customAmount');
+  function clear(){ btns.forEach(function(x){x.classList.remove('on');}); other.classList.remove('on'); }
+  btns.forEach(function(b){ b.addEventListener('click',function(){ clear(); b.classList.add('on'); amt.value=b.dataset.v; custom.style.display='none'; custom.value=''; }); });
+  other.addEventListener('click',function(){ clear(); other.classList.add('on'); custom.style.display='block'; custom.focus(); amt.value=custom.value; });
+  custom.addEventListener('input',function(){ amt.value=custom.value; });
+  document.querySelectorAll('.paym input').forEach(function(r){ r.addEventListener('change',function(){ document.querySelectorAll('.paym label').forEach(function(l){ l.classList.toggle('on', l.querySelector('input').checked); }); }); });
+  document.getElementById('contributeForm').addEventListener('submit',function(e){ if(!amt.value||Number(amt.value)<=0){ e.preventDefault(); other.click(); custom.placeholder='Elegí o escribí un monto'; } });
+})();
+</script>
+{% endblock %}

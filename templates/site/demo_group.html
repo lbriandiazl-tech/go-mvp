@@ -32,8 +32,8 @@
           <div class="g-body">
             <small class="g-k">ORGANIZA MARTINA</small>
             <h2>Cumpleaños de Sofía</h2>
-            <div class="g-prog"><div><b id="dTotal">$ 18.400</b><span>juntados</span></div><div class="g-bar"><i id="dBar" style="width:66%"></i></div></div>
-            <p class="g-meta"><span id="dCount">12</span> personas se sumaron · Cierra el viernes</p>
+            <div class="g-prog"><div><b id="dTotal">$ 18.400</b><span>reunidos</span></div></div>
+            <p class="g-meta"><span id="dCount">12</span> personas se sumaron · Cierra el viernes 9 de octubre</p>
             <div class="g-people" id="dPeople">
               <span style="background:#D8B872">LC</span><span style="background:#C9D6C5">AP</span><span style="background:#E3C9A8">JM</span><span style="background:#D6CFE0">RV</span><span class="more">+8</span>
             </div>
@@ -121,12 +121,11 @@
       '<div class="lm-row"><span class="av" style="background:#C9D6C5">AP</span><div><b>Ana Pereira</b><small>Hace 5 horas</small></div><em>Se sumó</em></div>'+
       '<div class="lm-foot"><span>13 personas · total</span><b>'+fmt(total)+'</b></div>';
     document.getElementById('dTotal').textContent=fmt(total);
-    document.getElementById('dBar').style.width=Math.min(100,total/goal*100)+'%';
     document.getElementById('dCount').textContent='13';
     var p=document.getElementById('dPeople'); if(!p.querySelector('.me')){var s=document.createElement('span'); s.className='me'; s.style.background='#B98D34'; s.textContent=initials(name); p.insertBefore(s,p.firstChild);}
   }
   document.getElementById('dRestart').addEventListener('click',function(){
-    document.getElementById('dTotal').textContent=fmt(base); document.getElementById('dBar').style.width='66%'; document.getElementById('dCount').textContent='12';
+    document.getElementById('dTotal').textContent=fmt(base); document.getElementById('dCount').textContent='12';
     var me=document.querySelector('#dPeople .me'); if(me) me.remove(); go(1);
   });
 })();

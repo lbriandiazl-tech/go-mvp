@@ -34,6 +34,36 @@
     </div>
   </div>
 
+  <!-- Aportes registrados sin pago -->
+  <h2 class="serif" style="font-size:17px; margin:34px 0 4px;">Aportes registrados, a la espera del link de pago ({{ pledges | length }})</h2>
+  <p class="muted" style="margin:0 0 4px;">Personas que se sumaron mientras no había medio de pago activo. Cuando recibas el pago, marcalo como pagado y pasa a contar en el total del regalo.</p>
+  {% if pledges %}
+  <div style="overflow-x:auto;">
+  <table>
+    <thead><tr><th>Quién</th><th>Email</th><th>Monto</th><th>Regalo</th><th>Fecha</th><th></th></tr></thead>
+    <tbody>
+      {% for c in pledges %}
+      <tr>
+        <td>{{ c.contributor_name }}</td>
+        <td><a href="mailto:{{ c.contributor_email }}">{{ c.contributor_email }}</a></td>
+        <td><strong>${{ c.amount | money }}</strong></td>
+        <td><a href="{{ url_for('public_gift', slug=c.slug) }}" target="_blank">{{ c.occasion }} de {{ c.recipient_name }}</a></td>
+        <td class="muted">{{ c.created_at | fdate }}</td>
+        <td>
+          <form method="POST" action="{{ url_for('admin_confirm_contribution', contribution_id=c.id, token=token) }}"
+                onsubmit="return confirm('¿Marcar como pagado el aporte de {{ c.contributor_name }} por ${{ c.amount | money }}?');">
+            <button class="btn btn-small" type="submit">Marcar pagado</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  </div>
+  {% else %}
+  <p class="muted">No hay aportes registrados sin pago.</p>
+  {% endif %}
+
   <!-- Transferencias pendientes -->
   <h2 class="serif" style="font-size:17px; margin:34px 0 4px;">Transferencias por confirmar ({{ pending | length }})</h2>
   <p class="muted" style="margin:0 0 4px;">Entrá al banco de Vaka, buscá la referencia en el concepto y confirmá solo si el monto coincide.</p>
@@ -78,7 +108,7 @@
         Organiza {{ g.organizer_name }} · <a href="mailto:{{ g.organizer_email }}">{{ g.organizer_email }}</a><br>
         Cerrada {{ g.closed_at | fdate }} ·
         {% if g.selected_item %}
-          Eligió: <strong style="color:var(--navy);">{{ g.selected_item }}</strong> ({{ g.selected_category }}), {{ g.selected_at | fdate }}
+          Eligió: <strong style="color:var(--navy);">{{ g.selected_item }}</strong> ({{ g.selected_category }}), {{ g.selected_at | fdate }}{% if g.recipient_email %} · contacto: <a href="mailto:{{ g.recipient_email }}">{{ g.recipient_email }}</a>{% endif %}
         {% else %}
           <span style="color:#7A4A16;">todavía no eligió</span>
         {% endif %}

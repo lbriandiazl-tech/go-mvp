@@ -1,0 +1,16 @@
+{% extends 'site/base.html' %}
+{% block title %}¡Gracias, {{ name }}! — Vaka{% endblock %}
+{% block head %}<meta name="robots" content="noindex">{% endblock %}
+{% block content %}
+<section class="app">
+  <div class="wrap app-narrow">
+    <div class="card app-card center">
+      <div class="done-ic"><svg><use href="#tick"/></svg></div>
+      <h1>¡Gracias, {{ name.split(' ')[0] }}!</h1>
+      <p class="lead">Registramos tu aporte de <b>${{ amount|money }}</b> para {{ event_title(gift) }}.</p>
+      <p class="hint" style="margin-top:14px">Te vamos a enviar a <b>{{ email }}</b> el link para completar el pago.</p>
+      <a class="btn btn-line" style="margin-top:26px" href="{{ url_for('public_gift', slug=gift.slug) }}">Volver al regalo</a>
+    </div>
+  </div>
+</section>
+{% endblock %}
