@@ -2,7 +2,9 @@ import hmac
 import os
 from datetime import datetime
 from urllib.parse import quote
-from flask import Flask, render_template, request, redirect, url_for, abort, flash
+from datetime import timedelta
+from flask import Flask, render_template, request, redirect, url_for, abort, flash, session
+from itsdangerous import URLSafeTimedSerializer, BadSignature, SignatureExpired
 import db
 import catalog
 import mercadopago_client
@@ -10,6 +12,46 @@ import resend_client
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "dev-only-change-in-production")
+app.permanent_session_lifetime = timedelta(days=90)
+app.config.update(SESSION_COOKIE_SECURE=bool(os.environ.get("RENDER")),
+                  SESSION_COOKIE_HTTPONLY=True, SESSION_COOKIE_SAMESITE="Lax")
+_login_signer = URLSafeTimedSerializer(app.secret_key, salt="vaka-login")
+LOGIN_LINK_MAX_AGE = 60 * 60  # 1 hora
+
+
+# ---------------------------------------------------------------
+# Cuentas sin contraseña: se entra con un link que llega por mail.
+#   session["email"] -> mail verificado (ve todos sus regalos)
+#   session["gifts"] -> regalos creados en este navegador
+# ---------------------------------------------------------------
+
+def current_email():
+    return session.get("email")
+
+
+def remember_gift(slug):
+    gifts = list(session.get("gifts", []))
+    if slug not in gifts:
+        gifts.insert(0, slug)
+    session["gifts"] = gifts[:20]
+    session.permanent = True
+
+
+def can_manage(gift):
+    if not gift:
+        return False
+    email = current_email()
+    if email and email == (gift["organizer_email"] or "").lower():
+        return True
+    return gift["slug"] in session.get("gifts", [])
+
+
+def login_link(email, next_url=None):
+    token = _login_signer.dumps({"e": email, "n": next_url or ""})
+    return url_for("login_verify", t=token, _external=True)
+
+
+app.jinja_env.globals["current_email"] = current_email
 
 
 def event_title(gift):
@@ -205,50 +247,84 @@ def create_gift():
         if not (recipient_name and occasion and organizer_name and organizer_email
                 and min_contribution > 0):
             flash("Completá todos los campos, incluido tu mail.")
-            return render_template("create_gift.html")
+            return render_template("site/create.html")
 
         slug, token = db.create_gift(
             recipient_name, occasion, organizer_name, organizer_email,
             min_contribution,
         )
+        remember_gift(slug)
 
         if resend_client.is_configured():
-            organizer_url = url_for("organizer_panel", slug=slug, token=token, _external=True)
+            panel_url = login_link(organizer_email, url_for("organizer_panel", slug=slug))
             try:
-                resend_client.send_organizer_link_email(organizer_email, f"{occasion} de {recipient_name}", organizer_url)
+                resend_client.send_gift_created_email(
+                    organizer_email, organizer_name, f"{occasion} de {recipient_name}",
+                    panel_url, url_for("public_gift", slug=slug, _external=True))
             except resend_client.ResendError:
                 pass  # no bloqueamos la creación del regalo si el mail falla
 
-        return redirect(url_for("organizer_panel", slug=slug, token=token))
+        return redirect(url_for("organizer_panel", slug=slug, nuevo=1))
 
-    return render_template("create_gift.html")
+    return render_template("site/create.html")
 
 
-@app.route("/recuperar", methods=["GET", "POST"])
+@app.route("/entrar", methods=["GET", "POST"])
 def recover_access():
+    """Mis regalos / ingresar: se pide el mail y se envía un link de acceso."""
+    if current_email() and request.method == "GET":
+        return redirect(url_for("my_gifts"))
     if request.method == "POST":
         email = request.form.get("email", "").strip().lower()
-        if email and resend_client.is_configured():
-            gifts = db.get_gifts_by_organizer_email(email)
-            if gifts:
-                gifts_for_email = [
-                    dict(
-                        occasion=event_title(g),
-                        organizer_url=url_for(
-                            "organizer_panel", slug=g["slug"], token=g["organizer_token"], _external=True
-                        ),
-                    )
-                    for g in gifts
-                ]
-                try:
-                    resend_client.send_recovery_email(email, gifts_for_email)
-                except resend_client.ResendError:
-                    pass
-        # Mismo mensaje exista o no el mail — así nadie puede usar este
-        # formulario para averiguar si un mail organizó algo acá.
-        return render_template("recover_sent.html")
+        if "@" in email and resend_client.is_configured():
+            try:
+                resend_client.send_login_email(email, login_link(email, request.form.get("next") or None))
+            except resend_client.ResendError:
+                pass
+        # Mismo mensaje exista o no la cuenta.
+        return render_template("site/login_sent.html", email=email)
+    return render_template("site/login.html", enabled=resend_client.is_configured(),
+                           next=request.args.get("next", ""))
 
-    return render_template("recover.html", enabled=resend_client.is_configured())
+
+@app.route("/recuperar")
+def recover_legacy():
+    return redirect(url_for("recover_access"), 301)
+
+
+@app.route("/entrar/verificar")
+def login_verify():
+    try:
+        data = _login_signer.loads(request.args.get("t", ""), max_age=LOGIN_LINK_MAX_AGE)
+    except SignatureExpired:
+        return render_template("site/login.html", enabled=resend_client.is_configured(), next="",
+                               error="El link de acceso venció. Pedí uno nuevo.")
+    except BadSignature:
+        abort(404)
+    session["email"] = data["e"]
+    session.permanent = True
+    nxt = data.get("n") or ""
+    if not nxt.startswith("/"):
+        nxt = url_for("my_gifts")
+    return redirect(nxt)
+
+
+@app.route("/mis-regalos")
+def my_gifts():
+    email = current_email()
+    if not email:
+        return redirect(url_for("recover_access"))
+    gifts = [dict(g, total=db.confirmed_total(g["id"]),
+                  count=len(db.confirmed_contributors(g["id"])))
+             for g in db.get_gifts_by_organizer_email(email)]
+    return render_template("site/my_gifts.html", gifts=gifts, email=email)
+
+
+@app.route("/salir", methods=["POST"])
+def logout():
+    session.pop("email", None)
+    session.pop("gifts", None)
+    return redirect(url_for("home"))
 
 
 # ---------------------------------------------------------------
@@ -367,9 +443,17 @@ def mercadopago_webhook():
 @app.route("/organizador/<slug>", methods=["GET"])
 def organizer_panel(slug):
     token = request.args.get("token", "")
-    gift = db.get_gift_by_token(slug, token)
+    if token:
+        # Links viejos con token: dan acceso y se redirige a la URL limpia.
+        if db.get_gift_by_token(slug, token):
+            remember_gift(slug)
+            return redirect(url_for("organizer_panel", slug=slug))
+        abort(404)
+    gift = db.get_gift_by_slug(slug)
     if not gift:
         abort(404)
+    if not can_manage(gift):
+        return redirect(url_for("recover_access", next=url_for("organizer_panel", slug=slug)))
     # Solo nombre, medio y estado: el monto individual NO sale del
     # servidor hacia el organizador (lo prometemos en la landing).
     contributions = [
@@ -392,21 +476,20 @@ def organizer_panel(slug):
     recipient_whatsapp_message = quote(recipient_whatsapp_text)
 
     return render_template(
-        "organizer_panel.html",
+        "site/organizer.html",
         gift=gift, contributions=contributions, total=total,
-        token=token, share_url=share_url, whatsapp_message=whatsapp_message,
+        share_url=share_url, whatsapp_message=whatsapp_message, is_new=bool(request.args.get("nuevo")),
         recipient_url=recipient_url, recipient_whatsapp_message=recipient_whatsapp_message,
     )
 
 
 @app.route("/organizador/<slug>/cerrar", methods=["POST"])
 def close_collection(slug):
-    token = request.args.get("token", "")
-    gift = db.get_gift_by_token(slug, token)
-    if not gift:
+    gift = db.get_gift_by_slug(slug)
+    if not can_manage(gift):
         abort(404)
     db.close_gift(gift["id"])
-    return redirect(url_for("organizer_panel", slug=slug, token=token))
+    return redirect(url_for("organizer_panel", slug=slug))
 
 
 # ---------------------------------------------------------------

@@ -1,0 +1,26 @@
+{% extends 'site/base.html' %}
+{% block title %}Mis regalos — Vaka{% endblock %}
+{% block content %}
+<section class="app">
+  <div class="wrap">
+    <div class="app-head">
+      <div><span class="kicker">Mis regalos</span><h1>Hola{% if gifts %}, {{ gifts[0].organizer_name.split(' ')[0] }}{% endif %}.</h1><p class="hint">Ingresaste como {{ email }} · <form method="post" action="{{ url_for('logout') }}" style="display:inline"><button class="linkbtn">Salir</button></form></p></div>
+      <a class="btn btn-gold" href="{{ url_for('create_gift') }}">Armar un regalo <svg><use href="#arrow"/></svg></a>
+    </div>
+    {% if gifts %}
+    <div class="gift-list">
+      {% for g in gifts %}
+      <a class="gift-row card" href="{{ url_for('organizer_panel', slug=g.slug) }}">
+        <span class="gr-ico"><svg><use href="#box"/></svg></span>
+        <span class="gr-main"><b>{{ event_title(g) }}</b><small>{{ g.count }} {{ 'persona' if g.count == 1 else 'personas' }} · ${{ g.total|money }} reunidos</small></span>
+        <span class="pill {{ 'ok' if g.status == 'open' else '' }}">{{ 'Abierto' if g.status == 'open' else 'Cerrado' }}</span>
+        <svg class="gr-go"><use href="#arrow"/></svg>
+      </a>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="card app-card center"><p class="lead">Todavía no tenés regalos con este email.</p><a class="btn btn-gold" href="{{ url_for('create_gift') }}">Armar el primero</a></div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

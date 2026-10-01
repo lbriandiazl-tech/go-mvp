@@ -1,0 +1,62 @@
+{% extends 'site/base.html' %}
+{% block title %}Armar un regalo — Vaka{% endblock %}
+{% block content %}
+<section class="app">
+  <div class="wrap app-grid">
+    <div class="app-intro">
+      <span class="kicker">Nuevo regalo</span>
+      <h1>Armemos <em>el regalo.</em></h1>
+      <p class="lead">Lleva un minuto. Después compartís el link con el grupo y cada persona se suma desde su celular.</p>
+      <ul class="checks">
+        <li>Sin descargas: todo funciona desde un link.</li>
+        <li>Cada aporte es privado; se ve el total.</li>
+        <li>Quien recibe elige su regalo.</li>
+      </ul>
+    </div>
+
+    <div class="card app-card">
+      {% with messages = get_flashed_messages() %}{% if messages %}{% for m in messages %}<div class="form-err">{{ m }}</div>{% endfor %}{% endif %}{% endwith %}
+      <form method="POST" class="form" id="createForm">
+        <p class="form-step">El regalo</p>
+        <div class="f2">
+          <div><label for="recipient_name">¿Para quién es?</label><input id="recipient_name" name="recipient_name" placeholder="Ej.: Sofía" required></div>
+          <div><label for="occasion_select">¿Qué se celebra?</label>
+            <select id="occasion_select">
+              {% for o in ['Cumpleaños','Casamiento','Aniversario','Nacimiento','Baby shower','Recibida','Despedida','Jubilación','Bienvenida','Día de la madre','Día del padre','Fin de año'] %}<option value="{{ o }}">{{ o }}</option>{% endfor %}
+              <option value="__other__">Otra ocasión</option>
+            </select>
+          </div>
+        </div>
+        <input id="occasion_custom" placeholder="Escribí la ocasión" style="display:none">
+        <input type="hidden" id="occasion" name="occasion" value="Cumpleaños">
+        <div><label for="min_contribution">Aporte sugerido por persona ($)</label><input type="number" id="min_contribution" name="min_contribution" placeholder="Ej.: 500" min="1" required>
+          <small class="hint">Es una sugerencia: cada persona elige cuánto aportar.</small></div>
+
+        <p class="form-step">Tus datos</p>
+        <div class="f2">
+          <div><label for="organizer_name">Tu nombre</label><input id="organizer_name" name="organizer_name" autocomplete="name" placeholder="Ej.: Martina Pérez" required></div>
+          <div><label for="organizer_email">Tu email</label><input type="email" id="organizer_email" name="organizer_email" autocomplete="email" placeholder="martina@mail.com" required value="{{ current_email() or '' }}"></div>
+        </div>
+        <small class="hint">Con este email ingresás a "Mis regalos" para ver los aportes y administrar el regalo. No hace falta contraseña.</small>
+
+        <button class="btn btn-gold" type="submit">Crear regalo <svg><use href="#arrow"/></svg></button>
+        <small class="hint">Al continuar aceptás los <a href="{{ url_for('page_terms') }}">Términos</a> y la <a href="{{ url_for('page_privacy') }}">Política de privacidad</a>.</small>
+      </form>
+    </div>
+  </div>
+</section>
+{% endblock %}
+{% block scripts %}
+<script>
+(function(){
+  var sel=document.getElementById('occasion_select'), custom=document.getElementById('occasion_custom'), hid=document.getElementById('occasion');
+  function sync(){ if(sel.value==='__other__'){custom.style.display='block'; hid.value=custom.value;} else {custom.style.display='none'; hid.value=sel.value;} }
+  sel.addEventListener('change',function(){ sync(); if(sel.value==='__other__') custom.focus(); });
+  custom.addEventListener('input',sync);
+  var pre=new URLSearchParams(location.search).get('ocasion');
+  if(pre){ var ok=[].some.call(sel.options,function(o){return o.value===pre;}); if(ok){sel.value=pre;} else {sel.value='__other__'; custom.value=pre;} }
+  sync();
+  document.getElementById('createForm').addEventListener('submit',function(e){ if(!hid.value.trim()){ e.preventDefault(); custom.focus(); } });
+})();
+</script>
+{% endblock %}

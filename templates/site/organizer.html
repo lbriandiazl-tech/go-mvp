@@ -1,0 +1,74 @@
+{% extends 'site/base.html' %}
+{% block title %}{{ event_title(gift) }} — Vaka{% endblock %}
+{% block content %}
+<section class="app">
+  <div class="wrap">
+    {% if is_new %}
+    <div class="welcome card">
+      <span class="app-ico"><svg><use href="#tick"/></svg></span>
+      <div><b>¡Tu regalo está listo!</b><span>Compartí el link con el grupo. Te enviamos el acceso a <b>{{ gift.organizer_email }}</b>; podés volver cuando quieras desde "Mis regalos".</span></div>
+    </div>
+    {% endif %}
+
+    <div class="app-head">
+      <div>
+        {% if current_email() %}<a class="crumb" href="{{ url_for('my_gifts') }}">← Mis regalos</a>{% endif %}
+        <h1>{{ event_title(gift) }}</h1>
+        <p class="hint">Organiza {{ gift.organizer_name }} · <span class="pill {{ 'ok' if gift.status == 'open' else '' }}">{{ 'Abierto' if gift.status == 'open' else 'Cerrado' }}</span></p>
+      </div>
+      <a class="btn btn-line" href="{{ url_for('public_gift', slug=gift.slug) }}" target="_blank" rel="noopener">Ver como invitado</a>
+    </div>
+
+    <div class="panel-grid">
+      <div class="card stat">
+        <small>Total reunido</small>
+        <b>${{ total|money }}</b>
+        <span>{{ contributions|selectattr('status','equalto','confirmed')|list|length }} aportes confirmados · sugerido ${{ gift.min_contribution|money }}</span>
+      </div>
+
+      <div class="card share">
+        <small>Link para el grupo</small>
+        <div class="share-row"><code id="shareUrl">{{ share_url }}</code><button class="btn btn-line sm" type="button" id="copyBtn">Copiar</button></div>
+        <a class="btn wa" href="https://wa.me/?text={{ whatsapp_message }}" target="_blank" rel="noopener"><svg><use href="#i-chat"/></svg> Compartir por WhatsApp</a>
+      </div>
+    </div>
+
+    <div class="card people">
+      <div class="people-head"><h2>Quiénes se sumaron</h2><span class="hint"><svg><use href="#lock"/></svg> Por privacidad se muestra el total, no el monto de cada aporte.</span></div>
+      {% if contributions %}
+      {% for c in contributions %}
+      <div class="lm-row">
+        <span class="av">{{ (c.contributor_name or '?')[:1]|upper }}</span>
+        <div><b>{{ c.contributor_name }}</b></div>
+        {% if c.status == 'confirmed' %}<em>Confirmado</em>{% else %}<em class="wait">Pendiente</em>{% endif %}
+      </div>
+      {% endfor %}
+      {% else %}
+      <p class="hint" style="padding:18px 0">Todavía no se sumó nadie. Compartí el link para que empiecen a llegar los aportes.</p>
+      {% endif %}
+    </div>
+
+    {% if gift.status == 'open' %}
+    <div class="card close-box">
+      <div><b>¿Ya se sumaron todos?</b><span>Al cerrar el regalo no se reciben más aportes y {{ gift.recipient_name }} puede abrirlo y elegir.</span></div>
+      <form method="POST" action="{{ url_for('close_collection', slug=gift.slug) }}" onsubmit="return confirm('¿Cerrar el regalo? No se van a recibir más aportes.');">
+        <button class="btn btn-gold" type="submit">Cerrar el regalo</button>
+      </form>
+    </div>
+    {% else %}
+    <div class="card close-box done">
+      <div><b>El regalo está cerrado.</b><span>Enviale a {{ gift.recipient_name }} su link para abrirlo y elegir.</span><code>{{ recipient_url }}</code></div>
+      <a class="btn wa" href="https://wa.me/?text={{ recipient_whatsapp_message }}" target="_blank" rel="noopener"><svg><use href="#i-chat"/></svg> Enviar por WhatsApp</a>
+    </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}
+{% block scripts %}
+<script>
+document.getElementById('copyBtn').addEventListener('click',function(){
+  var b=this, t=document.getElementById('shareUrl').textContent;
+  (navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(function(){ b.textContent='Copiado'; setTimeout(function(){b.textContent='Copiar';},1800); }).catch(function(){ prompt('Copiá el link:', t); });
+});
+</script>
+{% endblock %}

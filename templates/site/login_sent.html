@@ -1,0 +1,14 @@
+{% extends 'site/base.html' %}
+{% block title %}Revisá tu email — Vaka{% endblock %}
+{% block content %}
+<section class="app">
+  <div class="wrap app-narrow">
+    <div class="card app-card center">
+      <span class="app-ico"><svg><use href="#i-mail"/></svg></span>
+      <h1>Revisá tu email</h1>
+      <p class="lead">Te enviamos un link para ingresar a <b>{{ email }}</b>. Vale por una hora.</p>
+      <p class="hint">¿No llegó? Revisá la carpeta de spam o <a href="{{ url_for('recover_access') }}">probá de nuevo</a>.</p>
+    </div>
+  </div>
+</section>
+{% endblock %}

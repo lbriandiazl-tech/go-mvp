@@ -5,12 +5,7 @@
 <div class="wrap">
   <div class="wordmark" style="color:var(--gold);">Vaka</div>
   <h1 class="headline">Sumá tu aporte</h1>
-  <p class="subline">Para {{ event_title(gift) }}. Tu monto es privado — ni los demás participantes ni el organizador lo ven, solo que ya aportaste.</p>
-
-  <div class="card" style="margin:-14px 0 22px; padding:14px 16px; display:flex; gap:12px; align-items:flex-start;">
-    <svg viewBox="0 0 24 24" style="width:22px; height:22px; flex-shrink:0; margin-top:1px;" fill="none" stroke="#B98D34" stroke-width="1.5"><path d="M12 3l8 3v5c0 5.5-3.5 8.5-8 10-4.5-1.5-8-4.5-8-10V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg>
-    <p class="muted" style="margin:0; font-size:12.5px; line-height:1.5;"><strong style="color:var(--navy);">La plata la custodia Vaka, no el organizador.</strong> Queda resguardada hasta que {{ gift.recipient_name }} elige su regalo, y Vaka se encarga de entregarlo.</p>
-  </div>
+  <p class="subline">Para {{ event_title(gift) }}. Tu aporte es privado: los demás solo ven que te sumaste.</p>
 
   {% with messages = get_flashed_messages() %}
     {% if messages %}{% for m in messages %}<div class="flash">{{ m }}</div>{% endfor %}{% endif %}

@@ -220,7 +220,7 @@
       <a class="btn btn-line" style="margin-top:28px" href="{{ url_for('page_help') }}">Ver todas las preguntas <svg><use href="#arrow"/></svg></a>
     </div>
     <div>
-      {% for f in m.FAQ if f[1] in ['¿Cuánto cuesta usar Vaka?', '¿Alguien puede ver cuánto aporté?', '¿Cómo se paga?', '¿Hace falta descargar una app o crear una cuenta?', '¿Qué puede elegir quien recibe?', '¿Quién maneja el dinero?'] %}{{ m.faq_item(f[1], f[2]) }}{% endfor %}
+      {% for f in m.FAQ if f[1] in ['¿Cuánto cuesta usar Vaka?', '¿Alguien puede ver cuánto aporté?', '¿Cómo se paga?', '¿Hace falta descargar una app o crear una cuenta?', '¿Qué puede elegir quien recibe?'] %}{{ m.faq_item(f[1], f[2]) }}{% endfor %}
     </div>
   </div>
 </section>

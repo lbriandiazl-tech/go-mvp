@@ -76,7 +76,7 @@ def send_organizer_link_email(to_email, gift_occasion, organizer_url):
     html = _email_wrapper(f"""
         <h1 style="color:#F4EFE4; font-size:20px; margin:0 0 12px;">Guardá este mail</h1>
         <p style="color:rgba(244,239,228,0.75); font-size:14px; line-height:1.6;">
-          Este es el link para administrar tu colecta de "{gift_occasion}" —
+          Este es el link para administrar tu regalo de "{gift_occasion}" —
           confirmar aportes, cerrarla, y todo lo demás. Es la única forma de
           volver a entrar, así que guardá este mail.
         </p>
@@ -100,5 +100,42 @@ def send_recovery_email(to_email, gifts):
           Encontramos estos regalos organizados con este mail:
         </p>
         {rows}
+    """)
+    return send_email(to_email, subject, html)
+
+
+def _button(url, label):
+    return (f'<a href="{url}" style="display:inline-block; margin-top:18px; background:#B98D34; '
+            f'color:#0A131C; padding:13px 26px; text-decoration:none; font-weight:700; border-radius:999px;">{label}</a>')
+
+
+def send_gift_created_email(to_email, organizer_name, gift_title, panel_url, share_url):
+    subject = f"Tu regalo está listo — {gift_title}"
+    first = (organizer_name or "").split(" ")[0]
+    html = _email_wrapper(f"""
+        <h1 style="color:#F4EFE4; font-size:22px; margin:0 0 12px;">¡Listo, {first}!</h1>
+        <p style="color:rgba(244,239,228,0.78); font-size:14.5px; line-height:1.6; margin:0;">
+          Creaste el regalo <b style="color:#F4EFE4;">{gift_title}</b>. Compartí este link con el grupo para que cada persona se sume:
+        </p>
+        <p style="margin:14px 0 0; font-size:14px;"><a href="{share_url}" style="color:#D8B872;">{share_url}</a></p>
+        {_button(panel_url, "Ver mi regalo")}
+        <p style="color:rgba(244,239,228,0.55); font-size:12.5px; line-height:1.6; margin:22px 0 0;">
+          Para volver a tus regalos en cualquier momento, entrá a vaka.uy, tocá "Mis regalos" e ingresá con este mail.
+        </p>
+    """)
+    return send_email(to_email, subject, html)
+
+
+def send_login_email(to_email, login_url):
+    subject = "Tu acceso a Vaka"
+    html = _email_wrapper(f"""
+        <h1 style="color:#F4EFE4; font-size:22px; margin:0 0 12px;">Ingresá a Vaka</h1>
+        <p style="color:rgba(244,239,228,0.78); font-size:14.5px; line-height:1.6; margin:0;">
+          Tocá el botón para ver y administrar tus regalos. El link vale por una hora.
+        </p>
+        {_button(login_url, "Ingresar")}
+        <p style="color:rgba(244,239,228,0.55); font-size:12.5px; line-height:1.6; margin:22px 0 0;">
+          Si no pediste este acceso, podés ignorar este mail.
+        </p>
     """)
     return send_email(to_email, subject, html)

@@ -1,10 +1,10 @@
 {% extends "base.html" %}
-{% block title %}Colecta cerrada — Vaka{% endblock %}
+{% block title %}Regalo cerrado — Vaka{% endblock %}
 {% block bodyclass %}navy-page{% endblock %}
 {% block content %}
 <div class="wrap" style="text-align:center; padding-top:120px;">
   <div class="wordmark">Vaka</div>
-  <h1 class="headline">Esta colecta ya cerró</h1>
-  <p class="subline">Gracias por las ganas de sumarte — {{ gift.organizer_name }} ya cerró los aportes para {{ event_title(gift) }}.</p>
+  <h1 class="headline">Este regalo ya se cerró</h1>
+  <p class="subline">Gracias por querer sumarte. {{ gift.organizer_name }} ya cerró los aportes para {{ event_title(gift) }}.</p>
 </div>
 {% endblock %}

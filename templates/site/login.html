@@ -1,0 +1,24 @@
+{% extends 'site/base.html' %}
+{% block title %}Mis regalos — Vaka{% endblock %}
+{% block content %}
+<section class="app">
+  <div class="wrap app-narrow">
+    <div class="card app-card center">
+      <span class="app-ico"><svg><use href="#box"/></svg></span>
+      <h1>Mis regalos</h1>
+      <p class="lead">Ingresá con el email que usaste al crear el regalo. Te enviamos un link de acceso, sin contraseñas.</p>
+      {% if error %}<div class="form-err">{{ error }}</div>{% endif %}
+      {% if enabled %}
+      <form method="POST" class="form">
+        <input type="hidden" name="next" value="{{ next }}">
+        <div><label for="email">Email</label><input type="email" id="email" name="email" autocomplete="email" placeholder="tu@email.com" required autofocus></div>
+        <button class="btn btn-gold" type="submit">Enviarme el acceso <svg><use href="#arrow"/></svg></button>
+      </form>
+      {% else %}
+      <div class="form-err">El ingreso no está disponible en este momento. Escribinos a <a href="mailto:{{ CONTACT_EMAIL }}">{{ CONTACT_EMAIL }}</a>.</div>
+      {% endif %}
+      <p class="hint" style="margin-top:22px">¿Todavía no organizaste ninguno? <a href="{{ url_for('create_gift') }}">Armá un regalo</a></p>
+    </div>
+  </div>
+</section>
+{% endblock %}

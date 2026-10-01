@@ -31,12 +31,12 @@
   </div>
 
   <div class="card">
-    <p style="margin:0 0 4px; font-weight:600; font-size:13.5px;">La plata la custodia Vaka</p>
-    <p class="muted" style="margin:0;">Los aportes entran a cuentas de Vaka, no a la tuya. Nosotros confirmamos las transferencias y, cuando {{ gift.recipient_name }} elija su regalo, nos encargamos de conseguirlo y entregarlo.</p>
+    <p style="margin:0 0 4px; font-weight:600; font-size:13.5px;">Los aportes no pasan por tu cuenta</p>
+    <p class="muted" style="margin:0;">Se reúnen en Vaka y se destinan al regalo que elija {{ gift.recipient_name }}. Vos solo compartís el link y cerrás el regalo cuando quieras.</p>
   </div>
 
   <h2 class="serif" style="font-size:17px; margin:30px 0 4px;">Quiénes se sumaron</h2>
-  <p class="muted" style="margin:0 0 4px;">Por privacidad no ves cuánto puso cada uno, solo el total. Mercado Pago se confirma al instante; las transferencias las confirma Vaka en hasta 24 h hábiles.</p>
+  <p class="muted" style="margin:0 0 4px;">Por privacidad se muestra el total, no el monto de cada aporte. Mercado Pago se confirma al instante; las transferencias las confirma Vaka en hasta 24 h hábiles.</p>
 
   {% if contributions %}
   <table>
@@ -64,12 +64,12 @@
   {% endif %}
 
   {% if gift.status == 'open' %}
-  <form method="POST" action="{{ url_for('close_collection', slug=gift.slug, token=token) }}" onsubmit="return confirm('¿Cerrar la colecta? No se van a poder recibir más aportes, y {{ gift.recipient_name }} va a poder entrar a elegir su regalo.');">
-    <button class="btn btn-ghost" type="submit" style="margin-top:34px;">Cerrar colecta</button>
+  <form method="POST" action="{{ url_for('close_collection', slug=gift.slug, token=token) }}" onsubmit="return confirm('¿Cerrar el regalo? No se van a poder recibir más aportes, y {{ gift.recipient_name }} va a poder entrar a elegir su regalo.');">
+    <button class="btn btn-ghost" type="submit" style="margin-top:34px;">Cerrar el regalo</button>
   </form>
   {% else %}
   <div class="card" style="margin-top:30px;">
-    <p class="muted" style="margin:0 0 10px;">Colecta cerrada. {{ gift.recipient_name }} ya puede abrir su regalo — mandaselo:</p>
+    <p class="muted" style="margin:0 0 10px;">Regalo cerrado. {{ gift.recipient_name }} ya puede abrirlo. Compartile el link:</p>
     <a class="btn" style="margin-top:0; background:#25D366; color:#fff;"
        href="https://wa.me/?text={{ recipient_whatsapp_message }}" target="_blank" rel="noopener">
       Enviarle el link por WhatsApp
