@@ -157,6 +157,33 @@ def handle_contact_form(default_topic):
     return True, None
 
 
+SITE_URL = os.environ.get("SITE_URL", "https://vaka.uy").rstrip("/")
+app.jinja_env.globals["SITE_URL"] = SITE_URL
+SITEMAP_ENDPOINTS = ["home", "page_how", "demo_group", "demo_gift", "page_occasions",
+                     "page_business", "page_merchants", "page_help", "page_about",
+                     "create_gift", "page_terms", "page_privacy"]
+
+
+@app.route("/robots.txt")
+def robots_txt():
+    body = ("User-agent: *\n"
+            "Disallow: /admin\n"
+            "Disallow: /organizador/\n"
+            "Disallow: /g/\n"
+            "Disallow: /regalo/\n"
+            "Disallow: /webhooks/\n"
+            f"Sitemap: {SITE_URL}/sitemap.xml\n")
+    return body, 200, {"Content-Type": "text/plain; charset=utf-8"}
+
+
+@app.route("/sitemap.xml")
+def sitemap_xml():
+    urls = "".join(f"<url><loc>{SITE_URL}{url_for(e)}</loc></url>" for e in SITEMAP_ENDPOINTS)
+    xml = ('<?xml version="1.0" encoding="UTF-8"?>'
+           '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' + urls + '</urlset>')
+    return xml, 200, {"Content-Type": "application/xml; charset=utf-8"}
+
+
 @app.route("/ayuda", methods=["GET", "POST"])
 def page_help():
     sent, error = handle_contact_form("Consulta")
