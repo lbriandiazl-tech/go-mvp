@@ -814,3 +814,10 @@
   .gdemo .gd-stage{min-height:0 !important}
   .gdemo .gd-s{position:static;display:none;opacity:1;transform:none;pointer-events:auto}
   .gdemo .gd-s.on{display:flex;animation:rxin .6s var(--ease)}
+  .done-box{background:var(--cream);border:1px solid var(--line);border-radius:18px;padding:18px;margin:20px 0;display:flex;flex-direction:column;gap:12px;align-items:center}
+  .done-box .g-people span:last-child{margin-right:0}
+  .panel-grid > *{min-width:0}
+  .share{overflow:hidden}
+  .share-row{min-width:0}
+  .done-box .gift-total span{display:block;margin:2px 0 0}
+  .app-head .btn{flex:0 0 auto}

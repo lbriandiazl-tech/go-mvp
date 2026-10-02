@@ -19,11 +19,8 @@
         </div>
         <div><label for="message">Mensaje para {{ gift.recipient_name }} <span class="opt">(opcional)</span></label><textarea id="message" name="message" rows="3" placeholder="¡Feliz cumple!">{{ request.form.get('message','') }}</textarea></div>
         {% if not pay_enabled %}
-        <div><label for="contributor_email">Tu email</label><input type="email" id="contributor_email" name="contributor_email" autocomplete="email" placeholder="tu@email.com" required value="{{ request.form.get('contributor_email','') }}">
-          <small class="hint">Te enviamos a este email el link para completar el pago.</small></div>
         <button class="btn btn-gold" type="submit">Confirmar mi aporte <svg><use href="#arrow"/></svg></button>
         {% else %}
-        <div><label for="contributor_email">Tu email <span class="opt">(opcional)</span></label><input type="email" id="contributor_email" name="contributor_email" autocomplete="email" placeholder="tu@email.com"></div>
         {% if mp_enabled and transfer_enabled() %}
         <div><label>Medio de pago</label>
           <div class="paym"><label class="on"><input type="radio" name="payment_method" value="mercadopago" checked> Tarjeta</label><label><input type="radio" name="payment_method" value="transfer"> Transferencia bancaria</label></div></div>

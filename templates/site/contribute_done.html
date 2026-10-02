@@ -6,10 +6,14 @@
   <div class="wrap app-narrow">
     <div class="card app-card center">
       <div class="done-ic"><svg><use href="#tick"/></svg></div>
-      <h1>¡Gracias, {{ name.split(' ')[0] }}!</h1>
-      <p class="lead">Registramos tu aporte de <b>${{ amount|money }}</b> para {{ event_title(gift) }}.</p>
-      <p class="hint" style="margin-top:14px">Te vamos a enviar a <b>{{ email }}</b> el link para completar el pago.</p>
-      <a class="btn btn-line" style="margin-top:26px" href="{{ url_for('public_gift', slug=gift.slug) }}">Volver al regalo</a>
+      <h1>¡Ya te sumaste, {{ name.split(' ')[0] }}!</h1>
+      <p class="lead">Tu aporte de <b>${{ amount|money }}</b> para {{ event_title(gift) }} quedó confirmado.</p>
+      <div class="done-box">
+        <div class="gift-total"><b>${{ total|money }}</b><span>reunidos · {{ people|length }} {{ 'persona' if people|length == 1 else 'personas' }}</span></div>
+        <div class="g-people" style="justify-content:center">{% for n in people[-6:] %}<span style="background:{{ ['#D8B872','#C9D6C5','#E3C9A8','#D6CFE0','#E9CFC2','#C9D6E3'][loop.index0] }}">{{ n[:1]|upper }}</span>{% endfor %}</div>
+      </div>
+      <a class="btn btn-line" href="{{ url_for('public_gift', slug=gift.slug) }}">Volver al regalo</a>
+      {% if simulated %}<p class="hint" style="margin-top:20px">No se realizó ningún cobro por este aporte.</p>{% endif %}
     </div>
   </div>
 </section>

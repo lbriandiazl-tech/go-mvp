@@ -34,6 +34,13 @@
     </div>
   </div>
 
+  {% if simulated %}
+  <div class="card" style="border-color:var(--gold); background:rgba(185,141,52,0.08); padding:14px 18px;">
+    <strong style="font-size:13.5px;">Pagos en modo simulación</strong>
+    <p class="muted" style="margin:4px 0 0;">No hay procesador conectado: los aportes se confirman solos y no se cobra nada. Los totales no son plata real.</p>
+  </div>
+  {% endif %}
+
   <!-- Aportes registrados sin pago -->
   <h2 class="serif" style="font-size:17px; margin:34px 0 4px;">Aportes registrados, a la espera del link de pago ({{ pledges | length }})</h2>
   <p class="muted" style="margin:0 0 4px;">Personas que se sumaron mientras no había medio de pago activo. Cuando recibas el pago, marcalo como pagado y pasa a contar en el total del regalo.</p>

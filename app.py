@@ -25,6 +25,12 @@ LOGIN_LINK_MAX_AGE = 60 * 60  # 1 hora
 #   session["gifts"] -> regalos creados en este navegador
 # ---------------------------------------------------------------
 
+def _tidy_name(value):
+    """'sofia' -> 'Sofia'. Solo toca nombres escritos todo en minúscula."""
+    value = " ".join((value or "").split())
+    return value.title() if value and value == value.lower() else value
+
+
 def current_email():
     return session.get("email")
 
@@ -251,9 +257,9 @@ def page_help():
 @app.route("/crear", methods=["GET", "POST"])
 def create_gift():
     if request.method == "POST":
-        recipient_name = request.form["recipient_name"].strip()
+        recipient_name = _tidy_name(request.form["recipient_name"])
         occasion = request.form["occasion"].strip()
-        organizer_name = request.form["organizer_name"].strip()
+        organizer_name = _tidy_name(request.form["organizer_name"])
         organizer_email = request.form.get("organizer_email", "").strip().lower()
         try:
             min_contribution = int(request.form["min_contribution"])
@@ -379,7 +385,7 @@ def contribute(slug):
                                pay_enabled=pay_enabled, suggested=suggested, **extra)
 
     if request.method == "POST":
-        contributor_name = request.form.get("contributor_name", "").strip()[:80]
+        contributor_name = _tidy_name(request.form.get("contributor_name", ""))[:80]
         contributor_email = request.form.get("contributor_email", "").strip().lower()[:200]
         message = request.form.get("message", "").strip()[:500]
         try:
@@ -393,15 +399,17 @@ def contribute(slug):
             return form()
 
         if not pay_enabled:
-            # Sin procesador de pagos activo: se registra el aporte y se
-            # completa el pago más adelante con el link que enviamos por mail.
-            if "@" not in contributor_email:
-                flash("Ingresá tu email para enviarte el link de pago.")
-                return form()
-            db.create_contribution(gift["id"], contributor_name, amount, payment_method="pledge",
-                                   contributor_email=contributor_email, message=message)
+            # Etapa de prueba, sin procesador de pagos conectado: el pago se
+            # simula y el aporte queda confirmado al instante, para poder
+            # recorrer toda la experiencia. No se cobra nada. Cuando se
+            # conecte un procesador, este bloque deja de ejecutarse solo.
+            ref = db.create_contribution(gift["id"], contributor_name, amount, payment_method="simulado",
+                                         contributor_email=contributor_email, message=message)
+            db.confirm_contribution(db.get_contribution_by_reference(ref)["id"])
             return render_template("site/contribute_done.html", gift=gift, amount=amount,
-                                   name=contributor_name, email=contributor_email)
+                                   name=contributor_name, simulated=True,
+                                   total=db.confirmed_total(gift["id"]),
+                                   people=db.confirmed_contributors(gift["id"]))
 
         if payment_method == "mercadopago" and mp_enabled:
             ref = db.create_contribution(gift["id"], contributor_name, amount, payment_method="mercadopago",
@@ -546,6 +554,7 @@ def admin_panel():
         stats=db.admin_stats(),
         transfer_ok=transfer_enabled(),
         mp_ok=mercadopago_client.is_configured(),
+        simulated=not (mercadopago_client.is_configured() or transfer_enabled()),
     )
 
 
